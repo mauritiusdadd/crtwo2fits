@@ -12,8 +12,8 @@ setup(name='crtwo2fits',
       packages=['crtwo2fits'],
       package_data={'src': ['data/*', 'data/lang/*']},
       data_files=[('share/licenses/crtwo2fits', ['COPYRIGHT']),
-                  ('share/crtwo2fits/', ['conf/crtwo2fits.conf']),
-                  ('share/man/man1', ['man/crtwo2fits.man']),
+                  ('etc', ['conf/crtwo2fits.conf']),
+                  ('share/man/man1', ['man/crtwo2fits.1.gz']),
                   ],
       scripts=['scripts/crtwo2fits']
       )

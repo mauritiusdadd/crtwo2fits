@@ -40,20 +40,13 @@ if __name__ == "__main__":
     DEFAULT_DCRAW_EXC = shutil.which('dcraw')
     DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
 
-    SYSTEM_CONFIG = os.path.join('usr',
-                                 'share',
-                                 'cr2',
-                                 'cr2.conf')
-
-    LOCAL_CONFIG = os.path.join('usr',
-                                'local',
-                                'share',
-                                'cr2',
-                                'cr2.conf')
+    SYSTEM_CONFIG = os.path.join('/',
+                                 'etc',
+                                 'crtwo2fits.conf')
 
     USER_CONFIG = os.path.join(os.path.expanduser('~'),
                                '.config',
-                               'cr2.conf')
+                               'crtwo2fits.conf')
 
     # setting logger constants
     cons_format_str = '%(levelname)s: %(message)s'
@@ -125,10 +118,9 @@ if __name__ == "__main__":
 
     # reading systemwide configuration
     if not config.read(SYSTEM_CONFIG):
-        if not config.read(LOCAL_CONFIG):
-            log.log("Cannot read system configuration file, "
-                    "using default setting",
-                    logging.DEBUG)
+        log.log("Cannot read system configuration file, "
+                "using default setting",
+                logging.DEBUG)
 
     # reading user configuration
     if config.read(USER_CONFIG):
