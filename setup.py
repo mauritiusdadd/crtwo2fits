@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 
-setup(name='crttwo2fits',
+setup(name='crtwo2fits',
       version='0.1.0',
       description='',
       author='Maurizio D\'Addona',

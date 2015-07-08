@@ -82,7 +82,7 @@ if __name__ == "__main__":
                         help='Return full sensor image.')
 
     parser.add_argument('-l', '--log-file', metavar='LOGFILE',
-                        const='cr2.log', nargs='?',
+                        const='crtwo2fits.log', nargs='?',
                         help='''write the log to the file %(metavar)s.
                                 If no file is specified, then cr2.log
                                 is used by default''')

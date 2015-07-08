@@ -1,0 +1,100 @@
+'\" t
+.\" ** The above line should force tbl to be a preprocessor **
+.\" Man page for crtwo2fits 
+.\"
+.\" Copyright (C), 2015 Maurizio D'Addona <mauritiusdadd@gmail.com>
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file COPYING that comes with the
+.\" man-db distribution.
+.\"
+.\" %(date)s %(time)s
+.\" 
+
+.TH crtwo2fits 1 "%(date)s" "" ""
+.SH SYNOPSIS
+.sp
+\fBcrtwo2fits\fR [\fBOPTIONS\fR] \fIFILE\fR [\fIFILE ...\fR]
+.SH NAME
+crtwo2fits - A tool to convert CR2 raw files to FITS images.
+\fB
+.SH DESCRIPTION
+crtwo2fits is an open-source utility written in python for converting CR2 raw files into FITS images. It comes with a ready-to-use script and a python library that can be imported and used in other python programs. crtwo2fits by default it will try to use \fBdcraw\fR(1) to decode the raw image but it can be also configured to use other programs. It also integrates a native (slow) huffman decoder so it can decode CR2 files directly without the needs of external programs.
+.PP
+The decoded files will be saved with the same name of the original but with the \fI.fits\fR extension.
+.PP
+The full documentation of the python library can be accessed using the command:
+
+\ \ \ \ $\ python -c "import crtwo2fits; help(crtwo2fits)"
+.SH OPTIONS
+\fB\-h, \-\-help\fR
+.RS 8
+Display the program help message and exit
+.RE
+.PP
+\fB\-c, \-\-compressed\fR
+.RS 8
+Save to a compressed FITS file
+.RE
+.PP
+\fB\-e, \-\-export\-exif\fR
+.RS 8
+Export the image EXIF data as a python pickable file named \fIFILE.exif\fR
+.RE
+.PP
+\fB\-f, \-\-full\-frame\fR
+.RS 8
+Save a full-sensor image. Usually the image size specfied by the MAKERNOTES is smaller than the actual sensor size. Using this option a full size image will be saved wich contains also the normally hidden parts.
+
+\fBNOTE:\fR The full-frame image may contain data from portions of the sensor that have not been exposed to the light and/or that have not been processed by the camera software and this can result in dark borders around the image. This is not a bug in crtwo2fits.
+.RE
+.PP
+\fB\-l, \-\-log\-file\fR [\fIlogfile\fR]
+.RS8
+Write the log to the file \fIlogfile\fR. If no file is specified then \fIcrtwo2fits.log\fR is used by default.
+.RE
+.PP
+\fB\-n, \-\-native\-decoder\fR
+.PP
+.RS 8
+Use the native buit-in deocder instead of the default external decoder.
+.RE
+.PP
+\fB\-v, \-\-verbose\fR
+.PP
+.RS 8
+Increase the optput verbosity level. This option can be specified several time to increase the verbosity level further.
+.RE
+.PP
+.SH USAGE\ EXAMPLES
+Convert the file IMG_100.CR2 to IMG_100.fits:
+
+.RS 4
+ $ crtwo2fits IMG_100.CR2
+.RE
+
+Convert the file IMG_100.CR2 to a full-frame fits file and export the EXIF data to IMG_100.exif:
+
+.RS 4
+ $ crtwo2fits -e -f IMG_100.CR2
+.RE
+
+Convert the fil IMG_100.CR2 displaying the debug messages and save the log the \fIlogfile\fR
+
+.RS 4
+ $ crtwo2fits -vvv -l logfile IMG_100.CR2
+.RE
+
+.SH CONFIGURATION
+
+See \fBcrtwo2fits.conf\fR(5) for more details on configuring crtwo2fits using the \fIcrtwo2fits.conf\fR file.
+
+.SH SEE\ ALSO
+
+\fBcrtwo2fits.conf\fR(5), \fBdcraw\fR(1)
+
+.SH BUGS AND WISHES
+If you think you have found a bug, please open an issue on the github page of the program:
+
+.SH AUTHOR
+Maurizio D'Addona <mauritiusdadd@gmail.com>.
