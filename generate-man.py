@@ -12,7 +12,7 @@ dic = {
 
 files = [
     'man/crtwo2fits.1.man',
-    'man/crtwo2fits.1.man'
+    'man/crtwo2fits.conf.5.man'
 ]
 
 if __name__ == '__main__':
@@ -25,5 +25,5 @@ if __name__ == '__main__':
             text = re.sub(r'%\('+key+'\)s', dic[key], text)
 
         out_f = gzip.open(fname[:-4]+'.gz', 'w')
-        out_f.write(text.encode('ascii'))
+        out_f.write(text.encode('UTF-8'))
         out_f.close()

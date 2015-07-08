@@ -12,12 +12,12 @@
 .\" 
 
 .TH crtwo2fits 1 "%(date)s" "" ""
-.SH SYNOPSIS
-.sp
-\fBcrtwo2fits\fR [\fBOPTIONS\fR] \fIFILE\fR [\fIFILE ...\fR]
 .SH NAME
 crtwo2fits - A tool to convert CR2 raw files to FITS images.
 \fB
+.SH SYNOPSIS
+.sp
+\fBcrtwo2fits\fR [\fBOPTIONS\fR] \fIFILE\fR [\fIFILE ...\fR]
 .SH DESCRIPTION
 crtwo2fits is an open-source utility written in python for converting CR2 raw files into FITS images. It comes with a ready-to-use script and a python library that can be imported and used in other python programs. crtwo2fits by default it will try to use \fBdcraw\fR(1) to decode the raw image but it can be also configured to use other programs. It also integrates a native (slow) huffman decoder so it can decode CR2 files directly without the needs of external programs.
 .PP
@@ -93,7 +93,7 @@ See \fBcrtwo2fits.conf\fR(5) for more details on configuring crtwo2fits using th
 
 \fBcrtwo2fits.conf\fR(5), \fBdcraw\fR(1)
 
-.SH BUGS AND WISHES
+.SH BUGS
 If you think you have found a bug, please open an issue on the github page of the program:
 
 .SH AUTHOR
