@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+
+# cr2 is a program to convert CR2 files into FITS images
+# Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# NOTE: This script is based on the cr2plugin module of lxnstack
+#       but has evolved as a standalone script to directly decode CR2
+#       files
+
+import crtwo2fits.cr2 as cr2
+import crtwo2fits.log as log
+
+if __name__ == "__main__":
+
+    import os
+    import re
+    import sys
+    import shutil
+    import argparse
+    import configparser
+    import logging
+    import logging.handlers
+    import pickle
+
+    import astropy.time as atime
+
+    DEFAULT_DCRAW_EXC = shutil.which('dcraw')
+    DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
+
+    SYSTEM_CONFIG = os.path.join('usr',
+                                 'share',
+                                 'cr2',
+                                 'cr2.conf')
+
+    LOCAL_CONFIG = os.path.join('usr',
+                                'local',
+                                'share',
+                                'cr2',
+                                'cr2.conf')
+
+    USER_CONFIG = os.path.join(os.path.expanduser('~'),
+                               '.config',
+                               'cr2.conf')
+
+    # setting logger constants
+    cons_format_str = '%(levelname)s: %(message)s'
+    file_format_str = '[%(levelname)s] %(asctime)s - %(message)s'
+    cons_formatter = logging.Formatter(fmt=cons_format_str)
+    file_formatter = logging.Formatter(fmt=file_format_str)
+
+    # create configparser
+    config = configparser.ConfigParser()
+
+    # create argument parser
+    parser = argparse.ArgumentParser(
+        description='Converts CR2 raw files to FITS images'
+    )
+
+    parser.add_argument('files', metavar='FILE', type=str, nargs='+',
+                        help='paths of the CR2 file to convert')
+
+    parser.add_argument('-c', '--compressed', action='store_true',
+                        help='Save to a compressed FITS file')
+
+    parser.add_argument('-e', '--export-exif', action='store_true',
+                        help='export EXIF data to a file named FILE.exif')
+
+    parser.add_argument('-f', '--full-frame', action='store_true',
+                        help='Return full sensor image.')
+
+    parser.add_argument('-l', '--log-file', metavar='LOGFILE',
+                        const='cr2.log', nargs='?',
+                        help='''write the log to the file %(metavar)s.
+                                If no file is specified, then cr2.log
+                                is used by default''')
+
+    parser.add_argument('-n', '--native-decoder', action='store_true',
+                        help='use the built-in decoder instead of dcraw')
+
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                        help='increase the output verbosity level')
+
+    args = parser.parse_args()
+
+    # setting console verbosity
+    if args.verbose == 1:
+        verbosity = logging.INFO
+    elif args.verbose >= 2:
+        verbosity = logging.DEBUG
+    else:
+        verbosity = logging.WARNING
+
+    # creating logger
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(cons_formatter)
+    console_handler.setLevel(verbosity)
+
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(console_handler)
+
+    if args.log_file is not None:
+        file_handler = logging.handlers.RotatingFileHandler(
+            args.log_file,
+            backupCount=0)
+        file_handler.doRollover()
+        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(min(verbosity, logging.INFO))
+        logger.addHandler(file_handler)
+        log.log("logging to file \'" + args.log_file + "\'",
+                logging.DEBUG)
+
+    # reading systemwide configuration
+    if not config.read(SYSTEM_CONFIG):
+        if not config.read(LOCAL_CONFIG):
+            log.log("Cannot read system configuration file, "
+                    "using default setting",
+                    logging.DEBUG)
+
+    # reading user configuration
+    if config.read(USER_CONFIG):
+        log.log("Found user configuration file",
+                logging.DEBUG)
+
+    dec_exc = DEFAULT_DCRAW_EXC
+    dec_fmt = DEFAULT_DCRAW_FMT
+
+    # parsing configuration
+    try:
+        main_section = config['CONFIG']
+
+        try:
+            dec_sec_name = main_section['external-decoder'].upper()
+        except KeyError:
+            pass
+        else:
+            try:
+                decoder_section = config[dec_sec_name]
+            except KeyError:
+                log.log(
+                    "Cannot found the section '{}'".format(dec_sec_name),
+                    logging.ERROR)
+            else:
+                try:
+                    exec_name = decoder_section['exec']
+                    exec_cmd = decoder_section['command'][1:-1]
+                except KeyError as exc:
+                    log.log("Invalid or corrupted configuration: "
+                            "Key '{}' not found in section '{}'\n"
+                            "falling back to default values...".format(
+                                exc.args[0], dec_sec_name),
+                            logging.ERROR)
+                else:
+                    dec_exc = shutil.which(exec_name)
+                    dec_fmt = re.sub(r'\${([a-zA-Z0-9]*)}', r'{\1}', exec_cmd)
+    except KeyError:
+        log.log("Invalid or corrupted configuration: "
+                "'CONFIG' section is missing!\n"
+                "falling back to default values...",
+                logging.ERROR)
+
+    # decoding files
+    nfiles = len(args.files)
+    count = 1
+    for fname in args.files:
+        log.log("Decoding file {0}/{1}: \'{2:s}\'".format(
+                    count,
+                    nfiles,
+                    fname),
+                logging.INFO)
+        count += 1
+
+        cr2img = cr2.CR2Image(fname,
+                              ext_decoder=dec_exc,
+                              decoder_fmt_str=dec_fmt)
+
+        basename = os.path.splitext(fname)[0]
+        fitsname = basename+'.fits'
+        exifname = basename+'.exif'
+
+        data = cr2img.load(
+            fname,
+            ifd=3,
+            full_frame=args.full_frame,
+            native_decoder=args.native_decoder)
+
+        if data is None:
+            sys.exit(1)
+
+        if args.export_exif:
+            properties = {}
+            for k, v in cr2img.EXIF.items():  # READING EXIF
+                if (k == 306) or (k == 36867) or (k == 36868):
+                    date = re.findall('\d+\.?\d*', v)
+                    isostr = '{}-{}-{}T{}:{}:{}'.format(*date)
+                    ctime = atime.Time(isostr, format='isot')
+                    properties['UTCEPOCH'] = ctime.unix
+                if k in cr2.EXIF_TAGS:
+                    # self.addProperty(EXIF_TAGS.TAGS[k], v)
+                    properties[cr2.EXIF_TAGS[k]] = v
+                else:
+                    properties[k] = v
+
+            for k, v in cr2img.MAKERNOTES.items():
+                properties[('MAKERNOTE', k)] = v
+
+            log.log("Saving exif to \'" + exifname + "\'",
+                    logging.DEBUG)
+
+            try:
+                f = open(exifname, 'wb')
+                pickle.dump(properties, f)
+            except Exception as exc:
+                log.log('Cannot create file '+exifname+':'+str(exc),
+                        level=logging.ERROR)
+        else:
+            pass
+
+        exif_header = []
+
+        for k, v in cr2img.EXIF.items():  # READING EXIF
+            if (k == 306) or (k == 36867) or (k == 36868):
+                date = re.findall('\d+\.?\d*', v)
+                isostr = '{}-{}-{}T{}:{}:{}'.format(*date)
+                ctime = atime.Time(isostr, format='isot')
+                exif_header.append(('DATE-OBS', ctime.isot, 'Obsevatiot time'))
+            if k in cr2.EXIF_TAGS:
+                # self.addProperty(EXIF_TAGS.TAGS[k], v)
+                pass
+
+        log.log("Saving data to \'" + fitsname + "\'",
+                logging.DEBUG)
+        cr2.writeFITS(fitsname, data,
+                      compressed=args.compressed,
+                      header=exif_header)

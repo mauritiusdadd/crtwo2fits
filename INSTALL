@@ -1,0 +1,12 @@
+
+You can just run the scritp directy, but if you want a system isntallation,
+you should put the following files into their respective directories:
+
+  src/crtwo2fits -> $prefix/bin/crtwo2fits
+  conf/crtwo2fits.conf -> $prefix/share/csrtwo2fits(crtwo2fits.conf
+  man/crtwo2fits.man -> $prefix/man/crtwo2fits.man
+
+Where $prefix can be either /usr or /usr/local.
+
+However it is advisable to make a package compatible with the package manager of
+your distribution and use the latter instead of installing the program manually.

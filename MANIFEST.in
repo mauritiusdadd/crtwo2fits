@@ -1,0 +1,8 @@
+include INSTALL
+include COPYRIGHT
+include CHANGELOG
+include README.md
+include MANIFEST.in
+recursive-include conf *.*
+recursive-include man *.*
+recursive-include scripts *.*
