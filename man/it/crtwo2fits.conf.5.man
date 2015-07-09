@@ -1,0 +1,78 @@
+'\" t
+.\" ** The above line should force tbl to be a preprocessor **
+.\" Man page for crtwo2fits.conf
+.\"
+.\" Copyright (C), 2015 Maurizio D'Addona <mauritiusdadd@gmail.com>
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file COPYING that comes with the
+.\" man-db distribution.
+.\"
+.\" %(asctime)s
+.\"
+
+.TH crtwo2fits 1 "%(date)s" "" ""
+.SH NOME
+crtwo2fits.conf - File di configurazione per crtwo2fits.
+\fB
+.SH SINTASSI
+.sp
+/etc/crtwo2fits.conf
+.SH DESCRIZIONE
+crtwo2fits cerca di leggere il file di configurazione ongni volta che viene invocato. Il file di configurazione di sistema è \fI/etc/crtwo2fits.conf\fR e non dovrebbe mai essere modificato. Gli utenti possono personalizzare la configurazionde del programma creando il file \fI~/.config/crtwo2fits.conf\fR.
+.SH ESEMPIO
+.nf
+# configurazione di default di crtwo2fits 
+#
+# NOTE: Non modificare questo file. Se si vuole usare
+#       una configurazione personalizzata, copiare
+#       questo file nella direcotry ~/.config
+
+[CONFIG]
+external-decoder=dcraw-default
+
+[DCRAW-DEFAULT]
+exec=dcraw
+command='${exec} -t 0 -j -4 -W -D -d -c ${file}'
+.fi
+.SH SEZIONI
+Il file di configurazione è diviso in sezioni ed ogni sezione comincia con il proprio nome, in maiuscolo, racchiuso tra parentesi quadere e si estende fino alla sezione successiva o fino alla fine del file. Ogni sezione contiene almeno una coppia key-valore ed è permessa solo una coppia per linea. Le linee che cominciano con un cancelletto (#) sono considerati commenti e sono ignorati.
+.PP
+.RS 4
+\fB[CONFIG]\fR
+.PP
+.RS 4
+Questa è la sezione principale e dovrebbe sempre essere presente.
+.PP
+\fBexternal-decode=\fR\fIdecoder-section-name\fR
+.RS 4
+Specifica quale sezione contiene le informazioni sul decodificatore esterno da utilizzare. \fIdecoder-section-name\fR dovrebbe essere il nome, in minuscolo, di una sezione esistente.
+.RE
+.RE
+.PP
+\fB[DECODER-SECTION-NAME]\fR
+.PP
+.RS 4
+Questa rappresenta una sezione che contiene le informazioni su un programma decodificatore esterno.
+.PP
+\fBNOTE:\fR Il decodificatore esterno deve ritornare l'immagine decodificate come dati PGM sullo standard output.
+.PP
+\fBexec=\fR\fIexecutable\fR
+.RS 4
+Specifica l'eseguibile del decodificatore. \fIexecutable\fR deve essere il nome di un eseguibile presente nel proprio PATH, o il precorso completo dell'eseguibile del decodificatore.
+.RE
+.PP
+\fBcommand=\fR\fIformat-string\fR
+.RS 4
+Specifica il comando usato per invocare il decodificatore esterno. \fIformat-string\fR deve essere una stringa di testo delimiata da virgolette singole (') o doppie ("). Le parole chiave \fI${exec}\fR e \fI${file}\fR sono rimpiazzate dall'eseguibile del decodificatore e dal nome del file da decodificare.
+.PP
+.RE
+.SH VEDI\ ANCHE
+
+\fBcrtwo2fits\fR(1), \fBdcraw\fR(1)
+
+.SH BUGS
+Se pensi di aver trovato un bug, segnalalo aprendo un nuovo issue sulla pagina di github del programma: %(github)s
+
+.SH AUTORE
+Maurizio D'Addona <mauritiusdadd@gmail.com>.

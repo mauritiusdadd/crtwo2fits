@@ -6,13 +6,16 @@ import time
 
 dic = {
     'date': time.strftime("%Y-%m"),
-    'asctime': time.asctime()
+    'asctime': time.asctime(),
+    'github' : ""
 }
 
 
 files = [
     'man/crtwo2fits.1.man',
-    'man/crtwo2fits.conf.5.man'
+    'man/it/crtwo2fits.1.man',
+    'man/crtwo2fits.conf.5.man',
+    'man/it/crtwo2fits.conf.5.man'
 ]
 
 if __name__ == '__main__':

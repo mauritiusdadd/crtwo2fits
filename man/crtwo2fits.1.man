@@ -79,7 +79,7 @@ Convert the file IMG_100.CR2 to a full-frame fits file and export the EXIF data 
  $ crtwo2fits -e -f IMG_100.CR2
 .RE
 
-Convert the fil IMG_100.CR2 displaying the debug messages and save the log the \fIlogfile\fR
+Convert the file IMG_100.CR2 displaying the debug messages and save the log the \fIlogfile\fR
 
 .RS 4
  $ crtwo2fits -vvv -l logfile IMG_100.CR2
@@ -87,7 +87,7 @@ Convert the fil IMG_100.CR2 displaying the debug messages and save the log the \
 
 .SH CONFIGURATION
 
-See \fBcrtwo2fits.conf\fR(5) for more details on configuring crtwo2fits using the \fIcrtwo2fits.conf\fR file.
+See \fBcrtwo2fits.conf\fR(5) for more details on how to configure crtwo2fits using the \fIcrtwo2fits.conf\fR file.
 
 .SH SEE\ ALSO
 

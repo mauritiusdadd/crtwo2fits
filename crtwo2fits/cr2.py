@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # crtwo2fits is a program to convert CR2 files into FITS images
 # Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
 #
@@ -16,17 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# NOTE: This script is based on the cr2plugin module of lxnstack
-#       but has evolved as a standalone script to directly decode CR2
-#       files
+# NOTE: This module is based on the cr2plugin module of lxnstack
+#       but has evolved as a standalone module to directly decode
+#       CR2 files
 
 """
- The information used to wirte this program are taken form:
+ crtwo2fits.cr2
 
- (1) http://lclevy.free.fr/cr2/ => Canon (TM) CR2 specifications
+ provides the class CR2Image and FITS conversion functions.
 
- (2)  Lossless Jpeg and Huffman decoding:
-      http://www.impulseadventure.com/photo/jpeg-huffman-coding.html
+ The information used to wirte this module were taken form:
+
+ (1) Canon (TM) CR2 specifications:
+     http://lclevy.free.fr/cr2/
+
+ (2) Lossless Jpeg and Huffman decoding:
+     http://www.impulseadventure.com/photo/jpeg-huffman-coding.html
 
  (3) Lossless Jpeg information
      http://www.digitalpreservation.gov/formats/fdd/fdd000334.shtml
@@ -108,6 +111,27 @@ EXIF_TAGS = {}
 
 
 def getFitsStdHeader():
+    """
+    Return a basic FIST header based on STD_FITS_HEADER
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    head : astropy.io.fits.Header
+        a fits header object
+
+    Examples
+    --------
+    >>> import crtwo2fits.cr2 as cr2
+    >>> header = cr2.getFitsStdHeader()
+    >>> print(repr(h))
+    SWCREATE= 'crtwo2fits'
+    BITPIX  =                   16
+    NAXIS   =                    2
+    """
     try:
         return pyfits.header.Header(STD_FITS_HEADER)
     except:
@@ -119,12 +143,48 @@ def getFitsStdHeader():
 
 
 def ba2bs2(b):
+    """
+    Helper function for Huffman decoder: converts
+    a bytes/bytearray object to a bynary bitstring
+    where each byte is mapped to is 8-bit representation
+
+    Parameters
+    ----------
+    b : byte or bytearray
+        byte sequence to convert
+
+    Returns
+    -------
+    s : str
+        bistring representation of b
+
+    See also
+    --------
+    ba2bs
+
+    Examples
+    --------
+    >>> import crtwo2fits.cr2 as cr2
+    >>> cr2.ba2bs2(b'\x05')
+    '00000101'
+    >>> cr2.ba2bs(b'Hello')
+    '0100100001100101011011000110110001101111'
+    """
     m = map('{0:08b}'.format, b)
     s = ''.join(m)
     return s
 
 
 def ba2bs(b):
+    """
+    Helper function for Huffman decoder: similar to
+    ba2bs2, but needs packaed data. The coding structure
+    is defined by the constant DECODESTRING.
+
+    See also
+    --------
+    ba2bs2
+    """
     d = struct.unpack(DECODESTRING, b)
     m = map('{0:064b}'.format, d)
     s = ''.join(m)
@@ -132,7 +192,9 @@ def ba2bs(b):
 
 
 def _reconstructData(byte_order, *bytesdata):
-
+    """
+    Helper function for Huffman decoder
+    """
     result = 0
 
     if byte_order == b'II':
@@ -153,7 +215,9 @@ def _reconstructData(byte_order, *bytesdata):
 
 
 def _reconstructDataFromString(byte_order, bytesdata):
-
+    """
+    Helper function for Huffman decoder
+    """
     result = 0
     if byte_order == b'II':
         for b in range(len(bytesdata)):
@@ -173,7 +237,55 @@ def _reconstructDataFromString(byte_order, bytesdata):
 
 
 def _getTypeSize(ind):
+    """
+    Helper function for EXIF table reader
 
+    Return the size in byte of the specified type
+
+    Parameters
+    ----------
+    ind : int
+        The type id. The following values are allowed
+         id |      type     | size
+        ----|---------------|------
+          1 | byte          |  1
+          2 | ascii         | nan
+          3 | short         |  2
+          4 | long          |  4
+          5 | rational      |  8
+          6 | singed byte   |  1
+          7 | undefined     | nan
+          8 | signed short  |  2
+          9 | signed long   |  4
+         10 | sig. rational |  8
+         11 | float         |  4
+         12 | double        |  8
+
+    Returns
+    -------
+    out : int
+        returns the size in bytes of the specified type.
+        For ascii type it returns -1
+        For undefined type it returns -2
+        For any id that does not match any known type, it
+        returns None
+
+    See also
+    --------
+    _getExifValue
+
+    Examples
+    --------
+    >>> import crtwo2fits.cr2 as cr2
+    >>> cr2._getTypeSize(0)
+
+    >>> cr2._getTypeSize(1)
+    1
+    >>> cr2._getTypeSize(2)
+    -1
+    >>> cr2._getTypeSize(7)
+    -2
+    """
     if ind == 1:     # byte
         return 1
     elif ind == 2:   # ascii
@@ -201,7 +313,59 @@ def _getTypeSize(ind):
 
 
 def _getExifValue(data, data_type):
+    """
+    Converts the raw EXIF data into the correspondig type
 
+    Parameters
+    ----------
+    data : byte or bytearray
+        the raw data
+
+    data_type : int
+        the type id
+
+    Returns
+    -------
+    data : variable type
+        the type is determinated using the data type id
+        according to the following table
+
+         id |      type
+        ----|---------------
+          1 | numpy.ubyte
+          2 | str
+          3 | numpy.uint16
+          4 | numpy.uint32
+          5 | 0 or "nan" or
+            | (uint32, uint32)
+          6 | numpy.byte
+          7 | type(data)
+          8 | numpy.int16
+          9 | numpy.int32
+         10 | 0 or "nan" or
+            | (int32, int32)
+         11 | numpy.float32
+         12 | numpy.float64
+
+    See also
+    --------
+    _getTypeSize
+
+    Examples
+    --------
+    >>> import crtwo2fits.cr2 as cr2
+    >>> cr2._getExifValue(b'12', 1)
+    12
+    >>> cr2._getExifValue(b'260', 1)
+    4
+    >>> cr2._getExifValue(b'129', 6)
+    -127
+    >>> cr2._getExifValue(b'129', 4)
+    129
+    >>> i = (9 << 32) + 4
+    >>> val = cr2._getExifValue(i, 5)
+    (4, 9)
+    """
     if data_type == 1:
         return np.ubyte(data)
     elif data_type == 2:
@@ -253,6 +417,41 @@ def _getExifValue(data, data_type):
 
 def pgm2numpy(data, byteorder='>'):
 
+    """
+    Convert PGM data to numpy array
+
+    Parameters
+    ----------
+
+    data : bytes
+        the PGM raw (binary) or plain text data
+
+    byteorder : str, default='>'
+        the byte order of binary data. Has effect only
+        if binary PGM data is passed to the function.
+
+        Allowed values are
+
+        '=' - native
+        '<' - little endian
+        '>' - big endian
+        '|' - not applicable
+
+        See numpy.dtype.byteorder for more information.
+
+    Examples
+    --------
+    >>> import crtwo2fits.cr2 as cr2
+    >>> PGM = b'P2 3 3 10 1 2 3 4 5 6 7 8 9'
+    >>> n = cr2.pgm2numpy(PGM)
+    >>> n.shape
+    (3, 3)
+    >>> n
+    array([[ 1.,  2.,  3.],
+           [ 4.,  5.,  6.],
+           [ 7.,  8.,  9.]])
+    """
+
     try:
         field = re.search(
             b"^P([25])(?:\s*#.*)*\s"
@@ -299,7 +498,7 @@ def pgm2numpy(data, byteorder='>'):
         # NOTE: comments extends until end of line!
         log.log("Found plain text PGM data",
                 logging.DEBUG)
-        value = re.findall(b"(\d+)(?:\s*#.*)*\s", image_data)
+        value = re.findall(b"(\d+)(?:\s*#.*)*\s*", image_data)
 
         if len(value) != lenght:
             log.log("corrupted or invalid PGM data",
@@ -319,30 +518,68 @@ def pgm2numpy(data, byteorder='>'):
 
 def getPredictorValue(psv, px_left, px_top, px_topleft):
 
-    # NOTE: From the (3) Lossless JPEG specifications
-    #       and (4) dcraw source code the following
-    #       predictors for a pixel P can be found:
-    #
-    #              COLOR COMPONENT X
-    #
-    #         ... +--------+--------+ ...
-    #             |        |        |
-    #             |top_left|  top   |
-    #             |        |        |
-    #         ... +--------+--------+ ...
-    #             |        |        |
-    #             |  left  |   P    |
-    #             |        |        |
-    #         ... +--------+--------+ ...
-    #
-    #  ScanTable.psv = 1 --> predictor = left pixel
-    #  ScanTable.psv = 2 --> predictor = top pixel
-    #  ScanTable.psv = 3 --> predictor = top_left pixel
-    #  ScanTable.psv = 4 --> predictor = left + top - top_left
-    #  ScanTable.psv = 5 --> predictor = left + ((top - top_left) >> 1)
-    #  ScanTable.psv = 6 --> predictor = top + ((left - top_left) >> 1)
-    #  ScanTable.psv = 7 --> predictor = (top + left)>>1
+    """
+     Return the predictor value for a pixel P from
+     its neighbours according to the psv value.
 
+                  COLOR COMPONENT X
+
+             ... +--------+--------+ ...
+                 |        |        |
+                 |top_left|  top   |
+                 |        |        |
+             ... +--------+--------+ ...
+                 |        |        |
+                 |  left  |   P    |
+                 |        |        |
+             ... +--------+--------+ ...
+
+    Parameters
+    ----------
+
+    psv : int
+        the predictor selection value
+
+    px_left : int
+        the value of the left neighbour pixel
+
+    px_top: int
+        the value of the top neighbour pixel
+
+    px_topleft : int
+        the value of the top-left neighbour pixel
+
+    Returns
+    -------
+
+    predictor : int
+        From the (3) Lossless JPEG specifications
+        and (4) dcraw source code the following
+        predictors for a pixel P can be found:
+
+        ScanTable.psv = 1 --> predictor = left pixel
+        ScanTable.psv = 2 --> predictor = top pixel
+        ScanTable.psv = 3 --> predictor = top_left pixel
+        ScanTable.psv = 4 --> predictor = left + top - top_left
+        ScanTable.psv = 5 --> predictor = left + ((top - top_left) >> 1)
+        ScanTable.psv = 6 --> predictor = top + ((left - top_left) >> 1)
+        ScanTable.psv = 7 --> predictor = (top + left)>>1
+
+        Therefore, the returned predictor value is
+        computed as follow:
+
+             psv |        predictor
+            -----|------------------------
+              0  | 0
+              1  | px_left
+              2  | px_top
+              3  | px_topleft
+              4  | px_left + px_top - px_topleft
+              5  | px_left + ((px_top - px_topleft) >> 1)
+              6  | px_top + ((px_left - px_topleft) >> 1)
+              7  | (px_top - px_left) >> 1
+             ... | 0
+    """
     if psv == 1:
         pred = px_left
     elif psv == 2:
@@ -364,6 +601,76 @@ def getPredictorValue(psv, px_left, px_top, px_topleft):
 
 
 class Sensor(object):
+
+    """
+    crtwo2fits.cr2.Sensor
+
+    This class holds the properties of the camera sensor as
+    specified by the MAKERNOTE table inside the CR2 file.
+
+
+                            SENSOR
+      +---------------------------------------------+
+      |                            TOP BORDER |  '  | |
+      |      _________________________________v  '  | |
+      |  L  |                                 |  '  | |
+      |  E  |                                 |  '  | |
+      |  F  |                                 | B'B | H
+      |  T  |                                 | O'O | E
+      |     |                                 | T'R | I
+      |  B  |                                 | T'D | G
+      |  O  |                                 | O'E | H
+      |  R  |                                 | M'R | T
+      |  D  |                                 |  '  | |
+      |  E  |                                 |  '  | |
+      |  R  |                                 |  '  | |
+      |- - >|_________________________________|..v  | |
+      |                                       '     | |
+      |- - - - - - - RIGHT BORDER- - - - - - >'     | |
+      +---------------------------------------------+ v
+      - - - - - - - - - - WIDTH - - - - - - - - - ->
+
+    Parameters
+    ----------
+    data : tuple of ints
+        a tuple containing the values of the class attributes
+
+    Attributes
+    ----------
+    width : int
+        the width of the sensor in pixels
+
+    height : int
+        the height of the sensor in pixels
+
+    left_border : int
+        the left margin of the actual image
+
+    top_border : int
+        the top margin of the actual image
+
+    right_border : int
+        the right margin of the actual image
+
+    bottom_border : int
+        the bottom margin of the actual image
+
+    black_mask_left_border : int
+        the left margin of the area used to
+        compute the black level
+
+    black_mask_top_border : int
+        the top margin of the area used to
+        compute the black level
+
+    black_mask_right_border : int
+        the right margin of the area used to
+        compute the black level
+
+    black_mask_bottom_border : int
+        the bottom margin of the area used to
+        compute the black level
+    """
 
     def __init__(self, data=(0, 0, 0, 0, 0, 0, 0, 0,
                              0, 0, 0, 0, 0, 0, 0, 0, 0)):
@@ -394,6 +701,17 @@ class Sensor(object):
 
 
 class HuffmanTable(object):
+
+    """
+    crtwo2fits.cr2.HuffmanTable
+
+    This class holds the information of the Huffman table
+
+    Parameters
+    ----------
+    data : bytes
+        raw data from CR2 file
+    """
 
     def __init__(self, data=None):
 
@@ -461,6 +779,10 @@ class HuffmanTable(object):
 
     def generateCodes(self, sym):
 
+        """
+        Generate the Huffman table structure
+        """
+
         branches = [['']]
         leafs = []
         current_count = 0
@@ -500,6 +822,18 @@ class HuffmanTable(object):
 
 
 class FrameTable(object):
+
+    """
+    crtwo2fits.cr2.FrameTable
+
+    This class holds the information of the FrameTable
+    from the lossless JPEG data inside the CR2 file
+
+    Parameters
+    ----------
+    data : bytes
+        raw data from CR2 file
+    """
 
     def __init__(self, data):
 
@@ -548,6 +882,17 @@ class FrameTable(object):
 
 class ScanTable(object):
 
+    """
+    crtwo2fits.cr2.ScanTable
+
+    This class holds the information of the ScanTable
+    from the lossless JPEG data inside the CR2 file
+
+    Parameters
+    ----------
+    data : bytes
+        raw data from CR2 file
+    """
     def __init__(self, data):
 
         self.components = data[4]
@@ -591,65 +936,48 @@ class ScanTable(object):
         return s
 
 
-class BitStream(object):
-
-    def __init__(self, data):
-
-        self._bdata = bytearray(data)
-        self._bitindex = 0
-        self._byteindex = 0
-
-    def seek(self, bits, pos=1):
-        if pos == 0:
-            pass
-        elif pos == 1:
-            if bits != 0:
-                tot = self.tellbits() + bits
-                if tot < 0:
-                    self._byteindex = 0
-                    self._bitindex = 0
-                else:
-                    self._byteindex = tot / 8
-                    self._bitindex = tot % 8
-        elif pos == 2:
-            pass
-        else:
-            pass
-
-    def tell(self):
-        return self._byteindex + float(self._bitindex) / 10
-
-    def tellbits(self):
-        return self._byteindex * 8 + self._bitindex
-
-    def getBits(self, total_bits=1):
-
-        available_bits = 8 - self._bitindex
-        val = self._bdata[self._byteindex] & ((1 << available_bits) - 1)
-
-        if total_bits <= available_bits:
-            self._bitindex += total_bits
-            if self._bitindex == 8:
-                self._bitindex = 0
-                self._byteindex += 1
-                return val
-            else:
-                return val >> (8 - self._bitindex)
-        else:
-            total_bits -= available_bits
-            oldpos = self._byteindex + 1
-            nbytes = 1+total_bits / 8
-
-            self._bitindex = total_bits % 8
-            self._byteindex += nbytes
-
-            for i in self._bdata[oldpos:oldpos+nbytes]:
-                val = (val << 8) + i
-            available_bits = 8 - self._bitindex
-            return val >> available_bits
-
-
 class CR2Image(object):
+
+    """
+    crtwo2fits.cr2.CR2Image
+
+    This object handles a CR2 file
+
+    Parameters
+    ----------
+    fname : str, optional
+        full path of the CR2 file. If this parameter is
+        passed, the file will be opened in the object
+        initialization. If the file cannot be opened an
+        exception is raised.
+
+    ext_decoder : str, optional
+        the full path of an external decoder executable.
+        The decore must return the full-frame size image
+        as PGM data (either as binary data or plain text)
+        on the the standard output.
+
+    decoder_fmt_str : str, optional
+        the command used to invoke the external decoder.
+        the keywords {exec} and {file} are replaced
+        by self.ext_decoder and self.filename respectively
+
+    Attributes
+    ----------
+    filename : str
+        the name of the currently opened CR2 file
+
+    fp : file object
+        the file object for the currently opened file
+
+    version : float
+        the version of the CR2 file format. Should
+        always be 2.0
+
+    isOpened : bool
+        indicates if the CR2 file is currently opened
+
+    """
 
     format = "CR2"
     format_description = "Canon Raw format version 2"
@@ -680,15 +1008,12 @@ class CR2Image(object):
     def __del__(self):
         self.close()
 
-    def cancel(self):
-        self._canceled = True
-
     def getImageBorders(self):
 
         """
-        Here we have a sensor with a Bayer matrix, so border values
+        The camera has a sensor with a Bayer matrix, so border values
         *must* be multiple of 2 and cropped image *must* be within
-        the makernote borders
+        the MAKERENOT borders
 
                                     SENSOR
               +---------------------------------------------+
@@ -710,6 +1035,19 @@ class CR2Image(object):
               |- - - - - - - RIGHT BORDER- - - - - - >'     | |
               +---------------------------------------------+ v
               - - - - - - - - -SENSOR WIDTH- - - - - - - - >
+
+        Paramenters
+        -----------
+        None
+
+        Returns
+        -------
+
+        borders : tuple of four ints
+            The image margins relative to the top-left most
+            pixel of the sensor, in the format of
+            (left, bottom, right, top)
+
         """
         bbord = self.Sensor.bottom_border - (self.Sensor.bottom_border % 2)
         tbord = self.Sensor.top_border + (self.Sensor.top_border % 2)
@@ -718,6 +1056,51 @@ class CR2Image(object):
         return (lbord, bbord, rbord, tbord)
 
     def load(self, fname=None, ifd=3, full_frame=False, native_decoder=False):
+
+        """
+        Load an image data from the CR2 file. If the file is closed
+        this function will open it too.
+
+        Parameters
+        ----------
+            fname : str, optional
+                The name of the file to open. If this parameter is
+                not passed, then the current CR2 file is used.
+
+            ifd : int, optional
+                The indec of the image frame index to read.
+                If this parameted is not passed then the third
+                frame (the RAW image) is opened.
+
+                Currently the following value are allowed:
+
+                 ifd |   frame   |       status
+                -----|-----------|----------------------
+                  1  | RGB JPEG  | not implemented yet
+                  3  | RAW IMAGE | native & ext. decoder
+
+            full_frame : bool, optional
+                If this parameter is True, then the MAKERNOTE borders
+                are ignored and the full-sensor image is returned.
+
+                If the value of this parameter is not specified,
+                False is assumed by default
+
+            native_decoder : bool
+                If this parameter is True, then the native decoder
+                is used instead of the external one. The default
+                value is False.
+
+        Returns
+        -------
+            image : numpy.ndarray or None
+                The functions returns a numpy.ndarray representing
+                the decompressed image  or None if the decoding
+                process failed.
+
+                The array has the shape (image height, image width)
+        """
+
         if (not self.isOpened):
             if fname is None:
                 raise SyntaxError("unknown file name")
@@ -769,6 +1152,14 @@ class CR2Image(object):
         return image
 
     def open(self):
+
+        """
+        Open the current CR2 file and extracts the
+        basic information needed for the decoding process.
+
+        If the file is opened successfully the attribute
+        self.isOpened is set to True
+        """
 
         header = self.fp.read(0x0f)
 
@@ -840,6 +1231,10 @@ class CR2Image(object):
         self.isOpened = True
 
     def close(self):
+        """
+        Close the currently opened CR2 file and set
+        the attribute self.isOpened to False
+        """
         del self.CR2_SLICES
         del self.IFD3
         del self.IFD0
@@ -847,12 +1242,27 @@ class CR2Image(object):
         del self.MAKERNOTES
         del self.EXIF
         self.fp.close()
+        self.isOpened = False
 
     def extractEmbeddedJpeg(self):
-        self._canceled = False
-        pass  # TODO
+        """
+        Read the interpolated RGB jpeg image from the CR2 file.
+
+        --- NOT IMPLEMENTED YET ---
+        """
+        raise NotImplemented("Function not implemented yet")
 
     def decodeRawImage(self):
+        """
+        Decode the RAW lossless jpeg data using the
+        native pure-python decoder
+
+        Returns
+        -------
+        image : numpy.ndarray or None
+            the decompressed full-sensor image
+            or None if the decoding process failed
+        """
 
         log.log("Using native decoder",
                 logging.DEBUG)
@@ -905,13 +1315,27 @@ class CR2Image(object):
 
         del rawdata
 
-        img = self._decompressLosslessJpeg(imdata, hts)
+        img = self.decompressLosslessJpeg(imdata, hts)
 
         del imdata
 
         return img
 
     def decodeExternalDecoder(self):
+        """
+        Decode the RAW lossless jpeg data using the
+        external decoder program
+
+        Returns
+        -------
+        image : numpy.ndarray or None
+            the decompressed full-sensor image
+            or None if the decoding process failed
+
+        See also
+        --------
+        pgm2numpy
+        """
         if not self.hasExternalDecoder():
             return None
 
@@ -936,82 +1360,10 @@ class CR2Image(object):
 
         return pgm2numpy(pgm_data)
 
-    def _decompressLosslessJpeg(self, data, hts):
-
-        # NOTE: as written in (1) the raw data is encoded as an image
-        #       whith 2 (or 4) components, and have the same height of
-        #       raw image but only 1/#components of its width
-        components = hts[SOF_MARKER].components
-        imagew = hts[SOF_MARKER].width * components
-        imageh = hts[SOF_MARKER].height
-
-        if (imagew != self.Sensor.width) or (imageh != self.Sensor.height):
-            log.log("Warning: probably corrupted data!",
-                    logging.WARNING)
-
-        # some usefull constants and variables
-        dataend = len(data)
-        buff = ba2bs(data[0:TOKENLEN])
-        lenbuff = len(buff)
-        datapos = TOKENLEN
-        dataleft = dataend-TOKENLEN
-        half_max_val = (1 << (hts[SOF_MARKER].bits - 1))
-        predictor = [half_max_val] * components
-        psv = hts[SOS_MARKER].psv
-
-        # computing the size of slices
-        if self.CR2_SLICES[1] == 0:
-            slices_size = self.imagew
-        else:
-            slices_size = []
-            for i in range(self.CR2_SLICES[1]):
-                slices_size.append(self.CR2_SLICES[3])
-            slices_size.append(self.CR2_SLICES[4])
-
-        # NOTE: For some unknown reason the code runs much more faster
-        #       using python2 instead of python3, probably because
-        #       python3 does more checks during execution.
-
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
-        # NOTE: most of the folloding section is needed to speedup
-        #       the decompression process because accessing a local
-        #       list or dictionary is faster then accessing class
-        #       elements or using the len() function.
-
-        masks = hts[DHT_MARKER].masks[:]
-        codes = hts[DHT_MARKER].codes[0, 0]
-        same_tables = True
-
-        for c in hts[DHT_MARKER].codes.values():
-            same_tables &= (c == codes)
-
-        # If the tables are equal, then switching between them
-        # is only a waste of time and only one table will be used
-        if same_tables:
-            kdic = sorted(codes.keys())
-            keys_len = {}
-            for k in kdic:
-                keys_len[k] = len(k)
-        else:
-            i = 0
-            keys_lens = {}
-            kdics = {}
-            codes = hts[DHT_MARKER].codes
-            indexes = list(codes.keys())
-            num_of_indexes = len(indexes)
-
-            # Sorting keys for a faster research
-            for c in indexes:
-                kdics[c] = sorted(codes[c].keys())
-                keys_lens[c] = {}
-                for k in kdics[c]:
-                    keys_lens[c][k] = len(k)
-
-            kdic = kdics[indexes[0]]
-            keys_len = keys_lens[indexes[0]]
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
-
+    def decompressLosslessJpeg(self, data, hts):
         """
+        Native pure-python lossless jpeg decoder
+
         As written in CR2 specifications(1), the image is divided into
         several vertical slices (from lef to right) and then each slice
         is compressed by an huffman encoder.
@@ -1089,7 +1441,99 @@ class CR2Image(object):
         The decoded image is now a perfect copy of the [c] RAW image as
         seen by the huffman encoder of the camera. To obtain the actual
         RAW image the data must be reshaped into vertical slices.
+
+        Parameters
+        ----------
+            data : byte
+                the raw data from CR2 file
+
+            hst : HuffmanTable
+                HuffmanTable object for the CR2 file
+
+        Notes
+        -----
+        For more information see
+
+         (2)  Lossless Jpeg and Huffman decoding:
+              http://www.impulseadventure.com/photo/jpeg-huffman-coding.html
+
+         (3) Lossless Jpeg information
+             http://www.digitalpreservation.gov/formats/fdd/fdd000334.shtml
         """
+
+        # NOTE: as written in (1) the raw data is encoded as an image
+        #       whith 2 (or 4) components, and have the same height of
+        #       raw image but only 1/#components of its width
+        components = hts[SOF_MARKER].components
+        imagew = hts[SOF_MARKER].width * components
+        imageh = hts[SOF_MARKER].height
+
+        if (imagew != self.Sensor.width) or (imageh != self.Sensor.height):
+            log.log("Warning: probably corrupted data!",
+                    logging.WARNING)
+
+        # some usefull constants and variables
+        dataend = len(data)
+        buff = ba2bs(data[0:TOKENLEN])
+        lenbuff = len(buff)
+        datapos = TOKENLEN
+        dataleft = dataend-TOKENLEN
+        half_max_val = (1 << (hts[SOF_MARKER].bits - 1))
+        predictor = [half_max_val] * components
+        psv = hts[SOS_MARKER].psv
+
+        # computing the size of slices
+        if self.CR2_SLICES[1] == 0:
+            slices_size = self.imagew
+        else:
+            slices_size = []
+            for i in range(self.CR2_SLICES[1]):
+                slices_size.append(self.CR2_SLICES[3])
+            slices_size.append(self.CR2_SLICES[4])
+
+        # NOTE: For some unknown reason the code runs much more faster
+        #       using python2 instead of python3, probably because
+        #       python3 does more checks during execution.
+
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
+        # NOTE: most of the folloding section is needed to speedup
+        #       the decompression process because accessing a local
+        #       list or dictionary is faster then accessing class
+        #       elements or using the len() function.
+
+        masks = hts[DHT_MARKER].masks[:]
+        codes = hts[DHT_MARKER].codes[0, 0]
+        same_tables = True
+
+        for c in hts[DHT_MARKER].codes.values():
+            same_tables &= (c == codes)
+
+        # If the tables are equal, then switching between them
+        # is only a waste of time and only one table will be used
+        if same_tables:
+            kdic = sorted(codes.keys())
+            keys_len = {}
+            for k in kdic:
+                keys_len[k] = len(k)
+        else:
+            i = 0
+            keys_lens = {}
+            kdics = {}
+            codes = hts[DHT_MARKER].codes
+            indexes = list(codes.keys())
+            num_of_indexes = len(indexes)
+
+            # Sorting keys for a faster research
+            for c in indexes:
+                kdics[c] = sorted(codes[c].keys())
+                keys_lens[c] = {}
+                for k in kdics[c]:
+                    keys_lens[c][k] = len(k)
+
+            kdic = kdics[indexes[0]]
+            keys_len = keys_lens[indexes[0]]
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
+
         image = []
         rows = range(imageh)
         cols = range(imagew)
@@ -1266,6 +1710,9 @@ class CR2Image(object):
         return image
 
     def _readIfd(self, byteorder, offset):
+        """
+        Helper function for the native decoder
+        """
         self.fp.seek(offset, 0)
         raw_ifd = self.fp.read(2)
 
@@ -1306,6 +1753,36 @@ class CR2Image(object):
 
 
 def writeFITS(name, data, compressed=False, header=()):
+    """
+    Writes a numpy array to a FITS file
+
+    Parameters
+    ----------
+    name : str
+        The name of the FITS file to be saved
+
+    data : numpy.ndarray
+        The data to be saved
+
+    compressed : bool
+        If true save the data to a compressed
+        FITS file.
+
+    header : dict
+        a dictionary containing the header CARS
+        to be addded to the file. Must have the
+        format of
+
+        header = {
+            'key1' : ('value1', 'comment1')
+            'key2' : ('value2', 'comment2')
+            ...
+        }
+
+    Returns
+    -------
+    None
+    """
 
     if compressed:
         # NOTE: cannot compress primary HDU

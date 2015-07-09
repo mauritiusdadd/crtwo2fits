@@ -13,7 +13,7 @@
 
 .TH crtwo2fits 1 "%(date)s" "" ""
 .SH NAME
-crtwo2fits - A tool to convert CR2 raw files to FITS images.
+crtwo2fits.conf - Configuration file for crtwo2fits.
 \fB
 .SH SYNOPSIS
 .sp
@@ -46,7 +46,7 @@ This is the main section and should always be present.
 .PP
 \fBexternal-decode=\fR\fIdecoder-section-name\fR
 .RS 4
-Specifies wich section contains the informatin about external decoder to use. \fIdecoder-section-name\fR should be the name in lowercase of an existing section.
+Specifies wich section contains the information about external decoder to use. \fIdecoder-section-name\fR should be the name in lowercase of an existing section.
 .RE
 .RE
 .PP
@@ -55,7 +55,7 @@ Specifies wich section contains the informatin about external decoder to use. \f
 .RS 4
 This represents a section which contains the information about an external decoder program.
 .PP
-\fBNOTE:\fR The external decoder must return the decoded image as pgm data on the standard output.
+\fBNOTE:\fR The external decoder must return the decoded image as PGM data on the standard output.
 .PP
 \fBexec=\fR\fIexecutable\fR
 .RS 4
@@ -64,7 +64,7 @@ Specifies the decoder executable. \fIexecutable\fR must be the name of an execut
 .PP
 \fBcommand=\fR\fIformat-string\fR
 .RS 4
-Specifies the command used to invoke the external decoder program. \fIformat-string\fR must be a string delimited by single quotes or double quotes. The keywords \fI${exec}\fR and \fI${file}\fR are placeholders for the decoder executable and the name of the file to decode.
+Specifies the command used to invoke the external decoder. \fIformat-string\fR must be a string delimited by single quotes (') or double quotes ("). The keywords \fI${exec}\fR and \fI${file}\fR are placeholders for the decoder executable and the name of the file to decode.
 .PP
 .RE
 .SH SEE\ ALSO
@@ -72,7 +72,7 @@ Specifies the command used to invoke the external decoder program. \fIformat-str
 \fBcrtwo2fits\fR(1), \fBdcraw\fR(1)
 
 .SH BUGS
-If you think you have found a bug, please open an issue on the github page of the program:
+If you think you have found a bug, please open an issue on the github page of the program: %(github)s
 
 .SH AUTHOR
 Maurizio D'Addona <mauritiusdadd@gmail.com>.

@@ -11,10 +11,13 @@ setup(name='crtwo2fits',
       requires=['numpy', 'astropy'],
       packages=['crtwo2fits'],
       package_data={'src': ['data/*', 'data/lang/*']},
-      data_files=[('share/licenses/crtwo2fits', ['COPYRIGHT']),
-                  ('etc', ['conf/crtwo2fits.conf']),
-                  ('share/man/man1', ['man/crtwo2fits.1.gz']),
-                  ('share/man/man5', ['man/crtwo2fits.conf.5.gz']),
-                  ],
+      data_files=[
+          ('share/licenses/crtwo2fits', ['COPYRIGHT']),
+          ('etc', ['conf/crtwo2fits.conf']),
+          ('share/man/man1', ['man/crtwo2fits.1.gz']),
+          ('share/man/man5', ['man/crtwo2fits.conf.5.gz']),
+          ('share/man/it/man1', ['man/it/crtwo2fits.1.gz']),
+          ('share/man/it/man5', ['man/it/crtwo2fits.conf.5.gz']),
+      ],
       scripts=['scripts/crtwo2fits']
       )

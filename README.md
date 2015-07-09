@@ -24,4 +24,4 @@ For installation instruction read the file INSTALL
 * BUGS AND WISHES
 
 If you find a bug or you just want to suggest a new feature, please
-send me an e-mail.
+open a issue on github.
