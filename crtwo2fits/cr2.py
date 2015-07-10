@@ -41,19 +41,21 @@
 import os
 import re
 import struct
+import gettext
 import logging
 import logging.handlers
 import subprocess
 import numpy as np
 
 import crtwo2fits.log as log
+import crtwo2fits.messages as msg
+
+gettext.install('crtwo2fits', 'data/lang')
 
 try:
     import astropy.io.fits as pyfits
 except ImportError:
-    print("\nCan't import the python package 'astropy'.\n"
-          "Please install the package \'astropy\'!\n"
-          "You can find it at http://www.astropy.org/\n")
+    print(_(msg.ERR_NO_ASTROPY))
 
 EXTENSION = {'.cr2': 'CR2'}
 
@@ -461,7 +463,7 @@ def pgm2numpy(data, byteorder='>'):
             b"((?:.*\s*)*)",
             data).groups()
     except AttributeError:
-        log.log("Not a raw PGM data",
+        log.log(_(msg.ERR_NOT_PGM),
                 logging.ERROR)
         return None
     else:
@@ -477,17 +479,17 @@ def pgm2numpy(data, byteorder='>'):
         else:
             data_type = 'u1'
 
-        log.log("Image width: {}".format(width),
+        log.log(_(msg.DBG_IMG_WID.format(width)),
                 logging.DEBUG)
-        log.log("Image height: {}".format(height),
+        log.log(_(msg.DBG_IMG_HEI.format(height)),
                 logging.DEBUG)
-        log.log("Image dtype: {}".format(data_type),
+        log.log(_(msg.DBG_IMG_DTP.format(data_type)),
                 logging.DEBUG)
 
     if pid == 5:
 
         # Raw (bynary) pgm data
-        log.log("Found raw PGM data",
+        log.log(_(msg.DBG_PGM_RAW_FOUND),
                 logging.DEBUG)
         n = np.frombuffer(image_data,
                           dtype=data_type,
@@ -496,12 +498,12 @@ def pgm2numpy(data, byteorder='>'):
 
         # plain text pgm data
         # NOTE: comments extends until end of line!
-        log.log("Found plain text PGM data",
+        log.log(_(msg.DBG_PGM_TXT_FOUND),
                 logging.DEBUG)
         value = re.findall(b"(\d+)(?:\s*#.*)*\s*", image_data)
 
         if len(value) != lenght:
-            log.log("corrupted or invalid PGM data",
+            log.log(_(msg.ERR_PGM_INVALID),
                     logging.ERROR)
             return None
 
@@ -509,7 +511,7 @@ def pgm2numpy(data, byteorder='>'):
         for i in range(lenght):
             n[i] = int(value[i])
     else:
-        log.log("Unsupported PGM data format",
+        log.log(_(msg.ERR_PGM_UNSUPPORTED),
                 logging.ERROR)
         return None
 
@@ -990,8 +992,7 @@ class CR2Image(object):
         self.decoder_fmt = decoder_fmt_str
 
         if not self.hasExternalDecoder():
-            log.log("External decoder not found:"
-                    "only native decoder is available",
+            log.log(_(msg.WRN_NO_DECODER),
                     logging.WARNING)
 
         if fname is not None:
@@ -1116,11 +1117,11 @@ class CR2Image(object):
             if uncropped is None:
                 return None
 
-            log.log("Sensor size: {1}x{0}".format(*uncropped.shape),
+            log.log(_(msg.DBG_SENSOR_SIZE.format(*uncropped.shape)),
                     logging.DEBUG)
 
             if full_frame:
-                log.log("Output size: {1}x{0}".format(*uncropped.shape),
+                log.log(_(msg.DBG_OUTPUT_SIZE.format(*uncropped.shape)),
                         logging.DEBUG)
                 return uncropped
 
@@ -1133,11 +1134,10 @@ class CR2Image(object):
 
             try:
                 image = uncropped[tbord:bbord, lbord:rbord].copy()
-                log.log("Image size: {1}x{0}".format(*image.shape),
+                log.log(_(msg.DBG_IMAGE_SIZE.format(*image.shape)),
                         logging.DEBUG)
             except IndexError:
-                log.log("Opps, full frame image is smaller "
-                        "than than requestes size, cannot proced!",
+                log.log(_(msg.ERR_SMALL_RAW),
                         logging.ERROR)
                 image = None
 
@@ -1172,10 +1172,10 @@ class CR2Image(object):
         elif byteorder == b'MM':
             self.mode = "L;16B"
         else:
-            raise SyntaxError("unknown endian format")
+            raise SyntaxError(_(msg.ERR_UNKNOWN_ENDIAN))
 
         if (header[2:3] != b'*') or (header[8:10] != b'CR'):
-            raise SyntaxError("not a CR2 image file")
+            raise SyntaxError(_(msg.ERR_NOT_CR2))
 
         major_version = str(header[0x0a])  # should be 2
         minor_version = str(header[0x0b])  # should be 0
@@ -1190,14 +1190,14 @@ class CR2Image(object):
         self.IFD0 = self._readIfd(byteorder, ifd0_offset)
 
         if (EXIF not in self.IFD0.keys()):
-            raise SyntaxError("not a CR2 image file")
+            raise SyntaxError(_(msg.ERR_NOT_CR2))
 
         exif_offset = self.IFD0[EXIF]
 
         self.EXIF = self._readIfd(byteorder, exif_offset)
 
         if (MAKERNOTE not in self.EXIF.keys()):
-            raise SyntaxError("not a CR2 image file")
+            raise SyntaxError(_(msg.ERR_NOT_CR2))
 
         self.MAKERNOTES = self._readIfd(byteorder, self.EXIF[MAKERNOTE][2])
 
@@ -1264,21 +1264,19 @@ class CR2Image(object):
             or None if the decoding process failed
         """
 
-        log.log("Using native decoder",
+        log.log(_(msg.DBG_DECODER_NATIVE),
                 logging.DEBUG)
 
         self.fp.seek(self.CR2_SLICES[0], 0)
         rawdata = self.fp.read(self.CR2_SLICES[2])
 
         if rawdata[-2:] != EOI_MARKER:
-            errmsg = "EOI marker does not correspond to end of image"
-            raise SyntaxError(errmsg)
+            raise SyntaxError(_(msg.ERR_MARKER_EOI))
         else:
             image_data_end = len(rawdata) - 2
 
         if rawdata[0:2] != SOI_MARKER:
-            errmsg = "SOI marker does not correspond to start of image"
-            raise SyntaxError(errmsg)
+            raise SyntaxError(_(msg.ERR_MARKER_SOI))
         else:
             image_data_start = None
 
@@ -1339,7 +1337,7 @@ class CR2Image(object):
         if not self.hasExternalDecoder():
             return None
 
-        log.log("Using external decoder",
+        log.log(_(msg.DBG_DECODER_EXT),
                 logging.DEBUG)
 
         dec_cmd = self.decoder_fmt.format(
@@ -1352,9 +1350,12 @@ class CR2Image(object):
                              stderr=subprocess.PIPE)
 
         if p.returncode is not None:
-            log.log("An error has occured in dcraw:\n"
-                    "\'" + str(p.stderr.read()) + "\'",
-                    logging.ERROR)
+            log.log(
+                _(msg.ERR_EXT_DECODER).format(
+                    str(self.decoder_exec),
+                    str(p.stderr.read())
+                ),
+                logging.ERROR)
 
         pgm_data = p.stdout.read()
 
@@ -1469,7 +1470,7 @@ class CR2Image(object):
         imageh = hts[SOF_MARKER].height
 
         if (imagew != self.Sensor.width) or (imageh != self.Sensor.height):
-            log.log("Warning: probably corrupted data!",
+            log.log(_(msg.WRN_CORRUPTED_CR2),
                     logging.WARNING)
 
         # some usefull constants and variables

@@ -20,15 +20,13 @@
 #       but has evolved as a standalone script to directly decode CR2
 #       files
 
-import crtwo2fits.cr2 as cr2
-import crtwo2fits.log as log
-
 if __name__ == "__main__":
 
     import os
     import re
     import sys
     import shutil
+    import gettext
     import argparse
     import configparser
     import logging
@@ -36,6 +34,11 @@ if __name__ == "__main__":
     import pickle
 
     import astropy.time as atime
+
+    import crtwo2fits.cr2 as cr2
+    import crtwo2fits.log as log
+
+    gettext.install('crtwo2fits', '/usr/share/crtwo2fits')
 
     DEFAULT_DCRAW_EXC = shutil.which('dcraw')
     DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
@@ -59,32 +62,32 @@ if __name__ == "__main__":
 
     # create argument parser
     parser = argparse.ArgumentParser(
-        description='Converts CR2 raw files to FITS images'
+        description=_('Converts CR2 raw files to FITS images')
     )
 
     parser.add_argument('files', metavar='FILE', type=str, nargs='+',
-                        help='paths of the CR2 file to convert')
+                        help=_('paths of the CR2 file to convert'))
 
     parser.add_argument('-c', '--compressed', action='store_true',
-                        help='Save to a compressed FITS file')
+                        help=_('Save to a compressed FITS file'))
 
     parser.add_argument('-e', '--export-exif', action='store_true',
-                        help='export EXIF data to a file named FILE.exif')
+                        help=_('export EXIF data to a file named FILE.exif'))
 
     parser.add_argument('-f', '--full-frame', action='store_true',
-                        help='Return full sensor image.')
+                        help=_('Return full sensor image'))
 
     parser.add_argument('-l', '--log-file', metavar='LOGFILE',
                         const='crtwo2fits.log', nargs='?',
-                        help='''write the log to the file %(metavar)s.
-                                If no file is specified, then cr2.log
-                                is used by default''')
+                        help=_('''write the log to the file %(metavar)s.
+                                  If no file is specified, then cr2.log
+                                  is used by default'''))
 
     parser.add_argument('-n', '--native-decoder', action='store_true',
-                        help='use the built-in decoder instead of dcraw')
+                        help=_('use the built-in decoder instead of dcraw'))
 
     parser.add_argument('-v', '--verbose', action='count', default=0,
-                        help='increase the output verbosity level')
+                        help=_('increase the output verbosity level'))
 
     args = parser.parse_args()
 
@@ -113,18 +116,18 @@ if __name__ == "__main__":
         file_handler.setFormatter(file_formatter)
         file_handler.setLevel(min(verbosity, logging.INFO))
         logger.addHandler(file_handler)
-        log.log("logging to file \'" + args.log_file + "\'",
+        log.log(_("logging to file '{}'").format(args.log_file),
                 logging.DEBUG)
 
     # reading systemwide configuration
     if not config.read(SYSTEM_CONFIG):
-        log.log("Cannot read system configuration file, "
-                "using default setting",
+        log.log(_("Cannot read system configuration file, "
+                  "using default setting"),
                 logging.DEBUG)
 
     # reading user configuration
     if config.read(USER_CONFIG):
-        log.log("Found user configuration file",
+        log.log(_("Found user configuration file"),
                 logging.DEBUG)
 
     dec_exc = DEFAULT_DCRAW_EXC
@@ -143,32 +146,32 @@ if __name__ == "__main__":
                 decoder_section = config[dec_sec_name]
             except KeyError:
                 log.log(
-                    "Cannot found the section '{}'".format(dec_sec_name),
+                    _("Cannot find the section '{}'").format(dec_sec_name),
                     logging.ERROR)
             else:
                 try:
                     exec_name = decoder_section['exec']
                     exec_cmd = decoder_section['command'][1:-1]
                 except KeyError as exc:
-                    log.log("Invalid or corrupted configuration: "
-                            "Key '{}' not found in section '{}'\n"
-                            "falling back to default values...".format(
-                                exc.args[0], dec_sec_name),
+                    log.log(_("Invalid or corrupted configuration: "
+                              "Key '{}' not found in section '{}'\n"
+                              "falling back to default values...").format(
+                                 exc.args[0], dec_sec_name),
                             logging.ERROR)
                 else:
                     dec_exc = shutil.which(exec_name)
                     dec_fmt = re.sub(r'\${([a-zA-Z0-9]*)}', r'{\1}', exec_cmd)
     except KeyError:
-        log.log("Invalid or corrupted configuration: "
-                "'CONFIG' section is missing!\n"
-                "falling back to default values...",
+        log.log(_("Invalid or corrupted configuration: "
+                  "'CONFIG' section is missing!\n"
+                  "falling back to default values..."),
                 logging.ERROR)
 
     # decoding files
     nfiles = len(args.files)
     count = 1
     for fname in args.files:
-        log.log("Decoding file {0}/{1}: \'{2:s}\'".format(
+        log.log(_("Decoding file {0}/{1}: '{2:s}'").format(
                     count,
                     nfiles,
                     fname),
@@ -209,14 +212,17 @@ if __name__ == "__main__":
             for k, v in cr2img.MAKERNOTES.items():
                 properties[('MAKERNOTE', k)] = v
 
-            log.log("Saving exif to \'" + exifname + "\'",
+            log.log(_("Saving exif to '{}'").format(exifname),
                     logging.DEBUG)
 
             try:
                 f = open(exifname, 'wb')
                 pickle.dump(properties, f)
             except Exception as exc:
-                log.log('Cannot create file '+exifname+':'+str(exc),
+                log.log(_("Cannot create file '{}': '{}'").format(
+                            exifname,
+                            str(exc)
+                        ),
                         level=logging.ERROR)
         else:
             pass
@@ -233,7 +239,7 @@ if __name__ == "__main__":
                 # self.addProperty(EXIF_TAGS.TAGS[k], v)
                 pass
 
-        log.log("Saving data to \'" + fitsname + "\'",
+        log.log(_("Saving data to '{}'").format(fitsname),
                 logging.DEBUG)
         cr2.writeFITS(fitsname, data,
                       compressed=args.compressed,

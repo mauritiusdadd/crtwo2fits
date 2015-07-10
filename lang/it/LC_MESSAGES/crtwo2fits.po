@@ -1,0 +1,87 @@
+# crtwo2fits is a program to convert CR2 files into FITS images
+# Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#English messages for main program
+msgid ""
+msgstr ""
+"Project-Id-Version: crtwo2fits\n"
+"Report-Msgid-Bugs-To: mauritiusdadd@gmail.com\n"
+"POT-Creation-Date: 2015-07-10 19:45+0100\n"
+"PO-Revision-Date: 2015-07-10 19:45+0100\n"
+"Last-Translator: Maurizio D'Addona <mauritiusdadd@gmail.com>\n"
+"Language-Team: None\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: it\n"
+
+msgid "Converts CR2 raw files to FITS images"
+msgstr "Convete i file CR2 grezzi in immagini FITS"
+
+msgid "paths of the CR2 file to convert"
+msgstr "percorso del file CR2 da convertire"
+
+msgid "Save to a compressed FITS file"
+msgstr "Salva file FITS compresso"
+
+msgid "export EXIF data to a file named FILE.exif"
+msgstr "exporta i dati EXIF in un file chiamato FILE.exif"
+
+msgid "Return full sensor image."
+msgstr "Restituisce un'immagine a full-sensor"
+
+msgid "write the log to the file %(metavar)s. If no file is specified, then crtwo2fits.log is used by default"
+msgstr "Scrive il log nel file %(metavar). Se nessun file è specificato, allora il file crtwo2fits.log"
+
+msgid "use the built-in decoder instead of the external one"
+msgstr "usa il decoder integrato invece di quello esterno"
+
+msgid "increase the output verbosity level"
+msgstr "aumenta la verbosità dell'output"
+
+msgid "logging to file '{}'"
+msgstr "uso il file di log '{}'"
+
+msgid "Cannot read system configuration file, "
+      "using default setting"
+msgstr "Impossibile leggere il file di configurazione di sistema, uso i settaggi predefiniti"
+
+msgid "Found user configuration file"
+msgstr "Trovato un file di configurazione utente"
+
+msgid "Cannot found the section '{}'"
+msgstr "Impossibile trovare la sezione '{}'"
+
+msgid "Invalid or corrupted configuration: "
+      "Key '{}' not found in section '{}'\n"
+      "falling back to default values..."
+msgstr "Configurazione invalida o corrotta: Opzione '{}' non trovata '{}'\n Ritorno alle impostazio predefinite..."
+
+msgid "Invalid or corrupted configuration: "
+      "'CONFIG' section is missing!\n"
+msgstr "Configurazione invalida o corrotta: Sezione 'CONFIG' non presente!\n"
+
+msgid "Decoding file {0}/{1}: '{2:s}'"
+msgstr "Decodificando il fil1 {0}/{1}: '{2:s}'"
+
+msgid "Saving exif to '{}'"
+msgstr "Salvataggio dati exif nel file '{}'"
+
+msgid "Cannot create file '{}': '{}'"
+msgstr "Impossibile creare il file '{}': '{}'"
+
+msgid "Saving data to '{}'"
+msgstr "Salvataggio dati nel file '{}'"
