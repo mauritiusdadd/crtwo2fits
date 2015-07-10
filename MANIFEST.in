@@ -6,3 +6,6 @@ include MANIFEST.in
 recursive-include conf *.*
 recursive-include man *.*
 recursive-include scripts *.*
+recursive-include crtwo2fits/data *.skel
+recursive-include crtwo2fits/data *.po
+recursive-include crtwo2fits/data *.mo

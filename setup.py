@@ -10,7 +10,13 @@ setup(name='crtwo2fits',
       provides=['crtwo2fits'],
       requires=['numpy', 'astropy'],
       packages=['crtwo2fits'],
-      package_data={'crtwo2fits': ['data/*', 'data/lang/*']},
+      package_data={
+          'crtwo2fits': [
+            'data/lang/*.skel',
+            'data/lang/it/LC_MESSAGES/*.po',
+            'data/lang/it/LC_MESSAGES/*.mo',
+          ]
+      },
       data_files=[
           ('share/licenses/crtwo2fits', ['COPYRIGHT']),
           ('etc', ['conf/crtwo2fits.conf']),

@@ -75,7 +75,7 @@ msgid "Invalid or corrupted configuration: "
 msgstr "Configurazione invalida o corrotta: Sezione 'CONFIG' non presente!\n"
 
 msgid "Decoding file {0}/{1}: '{2:s}'"
-msgstr "Decodificando il fil1 {0}/{1}: '{2:s}'"
+msgstr "Decodificando il file {0}/{1}: '{2:s}'"
 
 msgid "Saving exif to '{}'"
 msgstr "Salvataggio dati exif nel file '{}'"

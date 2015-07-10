@@ -47,10 +47,15 @@ import logging.handlers
 import subprocess
 import numpy as np
 
+import crtwo2fits
 import crtwo2fits.log as log
 import crtwo2fits.messages as msg
 
-gettext.install('crtwo2fits', 'data/lang')
+localedir = os.path.join(os.path.dirname(crtwo2fits.__file__),
+                         'data',
+                         'lang')
+
+gettext.install('crtwo2fits', os.path.abspath(localedir)
 
 try:
     import astropy.io.fits as pyfits
