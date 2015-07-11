@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#English messages for main program
+#Italian messages for main program
 msgid ""
 msgstr ""
 "Project-Id-Version: crtwo2fits\n"
 "Report-Msgid-Bugs-To: mauritiusdadd@gmail.com\n"
 "POT-Creation-Date: 2015-07-10 19:45+0100\n"
-"PO-Revision-Date: 2015-07-10 19:45+0100\n"
+"PO-Revision-Date: 2015-07-11 09:38+0100\n"
 "Last-Translator: Maurizio D'Addona <mauritiusdadd@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,13 @@ msgstr "Salva file FITS compresso"
 msgid "export EXIF data to a file named FILE.exif"
 msgstr "exporta i dati EXIF in un file chiamato FILE.exif"
 
-msgid "Return full sensor image."
+msgid "Return full sensor image"
 msgstr "Restituisce un'immagine a full-sensor"
 
-msgid "write the log to the file %(metavar)s. If no file is specified, then crtwo2fits.log is used by default"
-msgstr "Scrive il log nel file %(metavar). Se nessun file è specificato, allora il file crtwo2fits.log"
+msgid "write the log to the file %(metavar)s. "
+      "If no file is specified, then crtwo2fits.log "
+      "is used by default"
+msgstr "Scrive il log nel file %(metavar)s. Se nessun file è specificato, allora è usato il file crtwo2fits.log"
 
 msgid "use the built-in decoder instead of the external one"
 msgstr "usa il decoder integrato invece di quello esterno"
@@ -52,7 +54,7 @@ msgstr "usa il decoder integrato invece di quello esterno"
 msgid "increase the output verbosity level"
 msgstr "aumenta la verbosità dell'output"
 
-msgid "logging to file '{}'"
+msgid "logging to the file '{}'"
 msgstr "uso il file di log '{}'"
 
 msgid "Cannot read system configuration file, "
@@ -62,7 +64,7 @@ msgstr "Impossibile leggere il file di configurazione di sistema, uso i settaggi
 msgid "Found user configuration file"
 msgstr "Trovato un file di configurazione utente"
 
-msgid "Cannot found the section '{}'"
+msgid "Cannot find the section '{}'"
 msgstr "Impossibile trovare la sezione '{}'"
 
 msgid "Invalid or corrupted configuration: "
@@ -72,7 +74,7 @@ msgstr "Configurazione invalida o corrotta: Opzione '{}' non trovata '{}'\n Rito
 
 msgid "Invalid or corrupted configuration: "
       "'CONFIG' section is missing!\n"
-msgstr "Configurazione invalida o corrotta: Sezione 'CONFIG' non presente!\n"
+msgstr "Configurazione invalida o corrotta: manca la sezione 'CONFIG'!\n"
 
 msgid "Decoding file {0}/{1}: '{2:s}'"
 msgstr "Decodificando il file {0}/{1}: '{2:s}'"

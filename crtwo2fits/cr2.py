@@ -55,7 +55,10 @@ localedir = os.path.join(os.path.dirname(crtwo2fits.__file__),
                          'data',
                          'lang')
 
-gettext.install('crtwo2fits', os.path.abspath(localedir)
+tr = gettext.translation('crtwo2fits',
+                         os.path.abspath(localedir),
+                         fallback=True)
+_ = tr.gettext
 
 try:
     import astropy.io.fits as pyfits

@@ -38,7 +38,11 @@ if __name__ == "__main__":
     import crtwo2fits.cr2 as cr2
     import crtwo2fits.log as log
 
-    gettext.install('crtwo2fits', '/usr/share/crtwo2fits')
+    try:
+        tr = gettext.translation('crtwo2fits', '/usr/share/crtwo2fits')
+        _ = tr.gettext
+    except:
+        _ = gettext.gettext
 
     DEFAULT_DCRAW_EXC = shutil.which('dcraw')
     DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
@@ -79,12 +83,13 @@ if __name__ == "__main__":
 
     parser.add_argument('-l', '--log-file', metavar='LOGFILE',
                         const='crtwo2fits.log', nargs='?',
-                        help=_('''write the log to the file %(metavar)s.
-                                  If no file is specified, then cr2.log
-                                  is used by default'''))
+                        help=_('write the log to the file %(metavar)s. '
+                               'If no file is specified, then crtwo2fits.log '
+                               'is used by default'))
 
     parser.add_argument('-n', '--native-decoder', action='store_true',
-                        help=_('use the built-in decoder instead of dcraw'))
+                        help=_('use the built-in decoder instead of '
+                               'the external one'))
 
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help=_('increase the output verbosity level'))
@@ -116,7 +121,7 @@ if __name__ == "__main__":
         file_handler.setFormatter(file_formatter)
         file_handler.setLevel(min(verbosity, logging.INFO))
         logger.addHandler(file_handler)
-        log.log(_("logging to file '{}'").format(args.log_file),
+        log.log(_("logging to the file '{}'").format(args.log_file),
                 logging.DEBUG)
 
     # reading systemwide configuration
