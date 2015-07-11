@@ -2,6 +2,10 @@ If you downloaded a source package, just execute
 
     $ python setup.py install
 
+and copy the configuration file to /etc:
+
+    # cp /usr/share/crtwo2fits/crtwo2fits.conf /etc
+
 If you cloned the source from the git repo, then you must firts run
 
     $ ./configure
