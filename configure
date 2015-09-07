@@ -3,7 +3,7 @@
 echo "Generating message translations... "
 find "." \
   -name "crtwo2fits.po" \
-  -execdir msgfmt "{}" -o "crtwo2fits.mo" \; \
+  -exec msgfmt "{}" -o "crtwo2fits.mo" \; \
   -exec echo " --> Found: '{}'" \;
 echo ""
 
