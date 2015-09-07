@@ -20,3 +20,6 @@ python:
 install:
   - "./configure"
   - "python setup.py install"
+
+script:
+  - which crtwo2fits
