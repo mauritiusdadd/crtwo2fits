@@ -5,10 +5,18 @@ os:
 
 sudo: off
 
+addons:
+
+  apt:
+    packages:
+      - python-numpy
+      - python-scipy
+      - gettext
+
 python:
   - "3.4"
 
 # command to install dependencies
 install:
-  - "./configure.sh"
+  - "./configure"
   - "python setup.py install"
