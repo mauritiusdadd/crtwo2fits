@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "Generating message translations... "
-find "." \
+find "./lang" "./crtwo2fits"\
   -name "crtwo2fits.po" \
-  -exec msgfmt "{}" -o "crtwo2fits.mo" \; \
+  -execdir msgfmt "{}" -o "crtwo2fits.mo" \; \
   -exec echo " --> Found: '{}'" \;
 echo ""
 
