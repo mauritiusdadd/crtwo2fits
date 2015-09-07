@@ -10,5 +10,6 @@ python:
 
 # command to install dependencies
 install:
+  - "ls"
   - "./configure"
   - "python setup.py install"
