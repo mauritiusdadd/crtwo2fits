@@ -1,11 +1,42 @@
 #!/bin/bash
 
-echo "Generating message translations... "
-find "./lang" "./crtwo2fits"\
-  -name "crtwo2fits.po" \
-  -execdir msgfmt "{}" -o "crtwo2fits.mo" \; \
-  -exec echo " --> Found: '{}'" \;
+msg() {
+  echo "==> $1"
+}
+
+msg2() {
+  echo " --> $1"
+}
+
+genTranslations() {
+  if [[ -d "$1" ]]; then
+    main_dir="$(pwd)"
+    for lang_dir in "$1"/*; do
+      if [[ -d "$lang_dir" ]]; then
+        msg "Entering in the target directory '$lang_dir':"
+        cd "${lang_dir}/LC_MESSAGES"
+        for pofile in *.po; do
+          mofile="${pofile/.po}.mo"
+          msg2 "building translation file: $pofile >>> $mofile"
+          msgfmt "${pofile}" -o "${mofile}" 
+        done
+      fi
+      cd "$main_dir"
+    done    
+  else
+    msg2 "'$1' is not a directory"
+  fi
+  echo ""
+}
+
 echo ""
+echo "-----------------------------------"
+echo "Generating message translations... "
+echo "-----------------------------------"
+echo ""
+
+genTranslations "lang"
+genTranslations "crtwo2fits/data/lang"
 
 echo "Generating man files..."
 python generate-man.py
