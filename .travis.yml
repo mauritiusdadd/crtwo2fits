@@ -1,9 +1,13 @@
 language: python
+
+os:
+  - linux
+
 sudo: off
+
 python:
   - "3.4"
+
 # command to install dependencies
 install:
-  - "pip install --upgrade pip"
-  - "pip install --upgrade -r REQUIREMENTS"
   - "python setup.py install"
