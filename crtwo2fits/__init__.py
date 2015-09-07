@@ -31,4 +31,5 @@
 from . import log
 from . import cr2
 
+__version__ = '0.1.1'
 __all__ = ['cr2', 'log']

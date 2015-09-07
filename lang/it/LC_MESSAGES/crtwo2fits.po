@@ -28,6 +28,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
 
+
+msgid "This program comes with NO WARRANTY, "
+      "to the extent permitted by law."
+msgstr "Questo programma viene fornito SENZA GARANZIA, per quanto permesso dalla legge."
+
+msgid "License GPLv3+: GNU GPL version 3 or later "
+msgstr "Licenza GPLv3+: GNU GPL versione 3 o successiva"
+
 msgid "Converts CR2 raw files to FITS images"
 msgstr "Convete i file CR2 grezzi in immagini FITS"
 
@@ -53,6 +61,9 @@ msgstr "usa il decoder integrato invece di quello esterno"
 
 msgid "increase the output verbosity level"
 msgstr "aumenta la verbosità dell'output"
+
+msgid "show the program version and exit."
+msgstr "mostra la versione del programma ed esce."
 
 msgid "logging to the file '{}'"
 msgstr "uso il file di log '{}'"

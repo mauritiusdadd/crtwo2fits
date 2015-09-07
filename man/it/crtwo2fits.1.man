@@ -66,6 +66,12 @@ Usa il decoder nativo invece del decoder esterno predefinito.
 Aumenta il livello verbosità dell'output. Questa opzione può essere specificata più volte per aumentare ulteriolmente il livello di verbosità.
 .RE
 .PP
+\fB    \-\-version\fR
+.PP
+.RS 8
+Mostra la versione del programma ed esce.
+.RE
+.PP
 .SH USAGE\ ESEMPI
 Converte il file IMG_100.CR2 nel file IMG_100.fits:
 

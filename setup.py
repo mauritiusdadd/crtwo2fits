@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='crtwo2fits',
-      version='0.1.0',
+      version='0.1.1',
       description='',
       author='Maurizio D\'Addona',
       author_email='mauritiusdadd@gmail.com',
