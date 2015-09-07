@@ -10,6 +10,5 @@ python:
 
 # command to install dependencies
 install:
-  - "ls"
-  - "./configure"
+  - "./configure.sh"
   - "python setup.py install"
