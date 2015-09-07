@@ -1,4 +1,5 @@
 * LEGAL NOTES
+[![Build Status](https://travis-ci.org/mauritiusdadd/crtwo2fits.svg?branch=master)](https://travis-ci.org/mauritiusdadd/crtwo2fits)
 
 Maurizio D'Addona <mauritiusdadd@gmail.com> (C) 2015
 
