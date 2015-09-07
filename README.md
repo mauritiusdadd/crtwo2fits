@@ -1,5 +1,6 @@
-* LEGAL NOTES
 [![Build Status](https://travis-ci.org/mauritiusdadd/crtwo2fits.svg?branch=master)](https://travis-ci.org/mauritiusdadd/crtwo2fits)
+
+* LEGAL NOTES
 
 Maurizio D'Addona <mauritiusdadd@gmail.com> (C) 2015
 
@@ -16,7 +17,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see [http://www.gnu.org/licenses/].
+along with this program.  If not, see (http://www.gnu.org/licenses/).
 
 * INSTALLATION
 
