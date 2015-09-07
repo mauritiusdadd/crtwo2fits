@@ -13,3 +13,5 @@ If you cloned the source from the git repo, then you must firts run
 It is advisable however to make a package compatible with the package manager
 of your distribution and use the latter instead of running the installation
 script manually.
+
+For list of python dependecies needed by this package see the file REQUIREMENTS
