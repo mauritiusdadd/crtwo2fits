@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/bash
 
 echo "Generating message translations... "
 find "." \
