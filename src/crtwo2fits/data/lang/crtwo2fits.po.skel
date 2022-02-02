@@ -1,0 +1,99 @@
+# crtwo2fits is a program to convert CR2 files into FITS images
+# Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#English messages
+msgid ""
+msgstr ""
+"Project-Id-Version: crtwo2fits\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-07-10 23:31+0900\n"
+"PO-Revision-Date: 2015-07-10 14:35+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+
+msgid "\nCan't import the python package 'astropy'.\n"
+  "Please install the package 'astropy'!\n"
+  "You can find it at http://www.astropy.org/\n"
+msgstr ""
+
+msgid "Not a raw PGM data"
+msgstr ""
+
+msgid "Image width: {}"
+msgstr ""
+
+msgid "Image height: {}"
+msgstr ""
+
+msgid "Image dtype: {}"
+msgstr ""
+
+msgid "Found raw PGM data"
+msgstr ""
+
+msgid "Found plain text PGM data"
+msgstr ""
+
+msgid "Using native decoder"
+msgstr ""
+
+msgid "Using external decoder"
+msgstr ""
+
+msgid "Image size: {1}x{0}"
+msgstr ""
+
+msgid "Output size: {1}x{0}"
+msgstr ""
+
+msgid "Sensor size: {1}x{0}"
+msgstr ""
+
+msgid "An error has occured in {}: '{}'"
+msgstr ""
+
+msgid "EOI marker does not correspond to end of image"
+msgstr ""
+
+msgid "SOI marker does not correspond to start of image"
+msgstr ""
+
+msgid "corrupted or invalid PGM data"
+msgstr ""
+
+msgid "Unsupported PGM data format"
+msgstr ""
+
+msgid "unknown endian format"
+msgstr ""
+
+msgid "not a CR2 image file"
+msgstr ""
+
+msgid "Oops, full frame image is smaller "
+  "than than requestes size, cannot proced!"
+msgstr ""
+
+msgid "Warning: probably corrupted data!"
+msgstr ""
+
+msgid "External decoder not found: "
+  "only native decoder is available"
+msgstr ""
