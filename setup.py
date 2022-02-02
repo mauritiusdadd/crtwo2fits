@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='crtwo2fits-mauritiusdadd',
+    name='crtwo2fits',
     version='0.2.0',
     author='Maurizio D\'Addona',
     author_email='mauritiusdadd@gmail.com',

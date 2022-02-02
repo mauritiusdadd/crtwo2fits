@@ -1,5 +1,5 @@
 # crtwo2fits is a program to convert CR2 files into FITS images
-# Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
+# Copyright (C) 2015-2022  Maurizio D'Addona <mauritiusdadd@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,9 +51,11 @@ import crtwo2fits
 import crtwo2fits.log as log
 import crtwo2fits.messages as msg
 
-localedir = os.path.join(os.path.dirname(crtwo2fits.__file__),
-                         'data',
-                         'lang')
+localedir = os.path.join(
+    os.path.dirname(crtwo2fits.__file__),
+    'data',
+    'lang'
+)
 
 tr = gettext.translation('crtwo2fits',
                          os.path.abspath(localedir),
@@ -144,7 +146,7 @@ def getFitsStdHeader():
     """
     try:
         return pyfits.header.Header(STD_FITS_HEADER)
-    except:
+    except Exception:
         # old pyfits method!
         head = pyfits.Header()
         for line in STD_FITS_HEADER:
@@ -426,7 +428,6 @@ def _getExifValue(data, data_type):
 
 
 def pgm2numpy(data, byteorder='>'):
-
     """
     Convert PGM data to numpy array
 
@@ -464,15 +465,15 @@ def pgm2numpy(data, byteorder='>'):
 
     try:
         field = re.search(
-            b"^P([25])(?:\s*#.*)*\s"
-            b"(\d+)(?:\s*#.*)*\s"
-            b"(\d+)(?:\s*#.*)*\s"
-            b"(\d+)(?:\s*#.*)*\s"
-            b"((?:.*\s*)*)",
-            data).groups()
+            rb"^P([25])(?:\s*#.*)*\s"
+            rb"(\d+)(?:\s*#.*)*\s"
+            rb"(\d+)(?:\s*#.*)*\s"
+            rb"(\d+)(?:\s*#.*)*\s"
+            rb"((?:.*\s*)*)",
+            data
+        ).groups()
     except AttributeError:
-        log.log(_(msg.ERR_NOT_PGM),
-                logging.ERROR)
+        log.log(_(msg.ERR_NOT_PGM), logging.ERROR)
         return None
     else:
         pid = int(field[0])
@@ -508,7 +509,7 @@ def pgm2numpy(data, byteorder='>'):
         # NOTE: comments extends until end of line!
         log.log(_(msg.DBG_PGM_TXT_FOUND),
                 logging.DEBUG)
-        value = re.findall(b"(\d+)(?:\s*#.*)*\s*", image_data)
+        value = re.findall(rb"(\d+)(?:\s*#.*)*\s*", image_data)
 
         if len(value) != lenght:
             log.log(_(msg.ERR_PGM_INVALID),
@@ -527,7 +528,6 @@ def pgm2numpy(data, byteorder='>'):
 
 
 def getPredictorValue(psv, px_left, px_top, px_topleft):
-
     """
      Return the predictor value for a pixel P from
      its neighbours according to the psv value.
@@ -611,7 +611,6 @@ def getPredictorValue(psv, px_left, px_top, px_topleft):
 
 
 class Sensor(object):
-
     """
     crtwo2fits.cr2.Sensor
 
@@ -788,7 +787,6 @@ class HuffmanTable(object):
         return s
 
     def generateCodes(self, sym):
-
         """
         Generate the Huffman table structure
         """
@@ -891,7 +889,6 @@ class FrameTable(object):
 
 
 class ScanTable(object):
-
     """
     crtwo2fits.cr2.ScanTable
 
@@ -903,6 +900,7 @@ class ScanTable(object):
     data : bytes
         raw data from CR2 file
     """
+
     def __init__(self, data):
 
         self.components = data[4]
@@ -1018,7 +1016,6 @@ class CR2Image(object):
         self.close()
 
     def getImageBorders(self):
-
         """
         The camera has a sensor with a Bayer matrix, so border values
         *must* be multiple of 2 and cropped image *must* be within
@@ -1065,7 +1062,6 @@ class CR2Image(object):
         return (lbord, bbord, rbord, tbord)
 
     def load(self, fname=None, ifd=3, full_frame=False, native_decoder=False):
-
         """
         Load an image data from the CR2 file. If the file is closed
         this function will open it too.
@@ -1160,7 +1156,6 @@ class CR2Image(object):
         return image
 
     def open(self):
-
         """
         Open the current CR2 file and extracts the
         basic information needed for the decoding process.
@@ -1258,7 +1253,7 @@ class CR2Image(object):
 
         --- NOT IMPLEMENTED YET ---
         """
-        raise NotImplemented("Function not implemented yet")
+        raise NotImplementedError("Function not implemented yet")
 
     def decodeRawImage(self):
         """
@@ -1599,17 +1594,17 @@ class CR2Image(object):
 
                                 try:
                                     pxl = crow[-components]
-                                except:
+                                except IndexError:
                                     pxl = 0
 
                                 try:
                                     pxt = image[-1][col]
-                                except:
+                                except IndexError:
                                     pxt = 0
 
                                 try:
                                     pxtl = image[-1][col-components]
-                                except:
+                                except IndexError:
                                     pxtl = 0
 
                                 pred = getPredictorValue(psv, pxl, pxt, pxtl)
@@ -1674,17 +1669,17 @@ class CR2Image(object):
 
                                 try:
                                     pxl = crow[-components]
-                                except:
+                                except IndexError:
                                     pxl = 0
 
                                 try:
                                     pxt = image[-1][col]
-                                except:
+                                except IndexError:
                                     pxt = 0
 
                                 try:
                                     pxtl = image[-1][col-components]
-                                except:
+                                except IndexError:
                                     pxtl = 0
 
                                 pred = getPredictorValue(psv, pxl, pxt, pxtl)
