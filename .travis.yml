@@ -8,16 +8,6 @@ jobs:
     - os: linux
       dist: focal
       python: "3.9"
-    - os: linux
-      dist: focal
-      python: "3.10-dev"
-    - os: windows
-      python: "3.6"
-    - os: windows
-      python: "3.9"
-    - os: windows
-      python: "3.10-dev"
-
 
 install:
   - "pip install -r requirements.txt"
