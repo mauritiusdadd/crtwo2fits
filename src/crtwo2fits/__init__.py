@@ -55,6 +55,19 @@ from . import cr2
 __all__ = ['cr2', 'log']
 
 
+if platform.system() == 'Linux':
+    DEFAULT_DCRAW_EXC = shutil.which('dcraw')
+    DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
+
+    SYSTEM_CONFIG = os.path.join(
+        '/', 'etc', 'crtwo2fits.conf'
+    )
+
+    USER_CONFIG = os.path.join(
+        os.path.expanduser('~'), '.config', 'crtwo2fits.conf'
+    )
+
+
 def main():
 
     try:
@@ -62,18 +75,7 @@ def main():
     except FileNotFoundError:
         tr = gettext.gettext
     else:
-        tr = tr.gettext
-
-    DEFAULT_DCRAW_EXC = shutil.which('dcraw')
-    DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
-
-    SYSTEM_CONFIG = os.path.join('/',
-                                 'etc',
-                                 'crtwo2fits.conf')
-
-    USER_CONFIG = os.path.join(os.path.expanduser('~'),
-                               '.config',
-                               'crtwo2fits.conf')
+        tr = tr.gettext   
 
     # setting logger constants
     cons_format_str = '%(levelname)s: %(message)s'

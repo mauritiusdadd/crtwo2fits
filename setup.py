@@ -17,9 +17,9 @@ setuptools.setup(
     package_dir={"": "src"},
     package_data={
         'crtwo2fits': [
-        'data/lang/*.skel',
-        'data/lang/it/LC_MESSAGES/*.po',
-        'data/lang/it/LC_MESSAGES/*.mo',
+            'data/lang/*.skel',
+            'data/lang/it/LC_MESSAGES/*.po',
+            'data/lang/it/LC_MESSAGES/*.mo',
         ]
     },
     data_files=[

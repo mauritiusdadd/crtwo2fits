@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mauritiusdadd/crtwo2fits.svg?branch=master)](https://travis-ci.org/mauritiusdadd/crtwo2fits)
+[![Build Status](https://app.travis-ci.com/mauritiusdadd/crtwo2fits.svg?branch=master)](https://travis-ci.org/mauritiusdadd/crtwo2fits)
 
 * LEGAL NOTES
 

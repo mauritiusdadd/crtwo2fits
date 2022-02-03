@@ -20,7 +20,8 @@
 #       but has evolved as a standalone script to directly decode CR2
 #       files
 
+import sys
 from . import main
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
