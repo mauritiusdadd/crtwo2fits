@@ -14,11 +14,10 @@ addons:
       - gettext
 
 python:
-  - "3.6"
-  - "3.7"
   - "3.8"
   - "3.9"
-  - "3.10"
+  - "3.10-dev"
+  - "3.11-dev"
 
 # command to install dependencies
 install:

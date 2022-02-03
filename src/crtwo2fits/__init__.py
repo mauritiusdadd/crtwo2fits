@@ -75,7 +75,7 @@ def main():
     except FileNotFoundError:
         tr = gettext.gettext
     else:
-        tr = tr.gettext   
+        tr = tr.gettext
 
     # setting logger constants
     cons_format_str = '%(levelname)s: %(message)s'
