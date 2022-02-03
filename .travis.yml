@@ -4,25 +4,22 @@ jobs:
   include:
     - os: linux
       dist: focal
+      python: "3.6"
+    - os: linux
+      dist: focal
+      python: "3.9"
+    - os: linux
+      dist: focal
+      python: "3.10-dev"
+    - os: windows
+      python: "3.6"
+    - os: windows
+      python: "3.9"
+    - os: windows
+      python: "3.10-dev"
 
-sudo: off
 
-addons:
-  apt:
-    packages:
-      - python-numpy
-      - python-scipy
-      - gettext
-
-python:
-  - "3.8"
-  - "3.9"
-  - "3.10-dev"
-  - "3.11-dev"
-
-# command to install dependencies
 install:
-  - "./configure"
   - "pip install -r requirements.txt"
   - "pip install ."
 
