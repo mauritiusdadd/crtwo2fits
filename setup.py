@@ -1,6 +1,35 @@
 #!/usr/bin/env python
 import setuptools
 
+import re
+import gzip
+import time
+
+BUILD_INFO = {
+    'date': time.strftime("%Y-%m"),
+    'asctime': time.asctime(),
+    'github': ""
+}
+
+
+class ManPagesExtension(setuptools.Extension):
+
+    def __init__(self, name, sources):
+        # don't invoke the original build_ext for this special extension
+        super().__init__(name, sources=[])
+
+        for fname in sources:
+            with open(fname, 'r') as inp_f:
+                text = inp_f.read()
+
+            for key, val in BUILD_INFO.items():
+                text = re.sub(r'%\('+key+r'\)s', val, text)
+
+            out_f = gzip.open(fname[:-4]+'.gz', 'w')
+            out_f.write(text.encode('UTF-8'))
+            out_f.close()
+
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
@@ -55,4 +84,12 @@ setuptools.setup(
             'crtwo2fits=crtwo2fits:main',
         ],
     },
+    ext_modules=[
+        ManPagesExtension('man', [
+            'man/crtwo2fits.1.man',
+            'man/it/crtwo2fits.1.man',
+            'man/crtwo2fits.conf.5.man',
+            'man/it/crtwo2fits.conf.5.man'
+        ])
+    ]
 )
