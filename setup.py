@@ -28,16 +28,8 @@ setuptools.setup(
         ('share/man/man5', ['man/crtwo2fits.conf.5.gz']),
         ('share/man/it/man1', ['man/it/crtwo2fits.1.gz']),
         ('share/man/it/man5', ['man/it/crtwo2fits.conf.5.gz']),
-        ('share/crtwo2fits', [
-                'conf/crtwo2fits.conf',
-                'lang/crtwo2fits.po.skel'
-            ]
-        ),
-        ('share/crtwo2fits/it/LC_MESSAGES',
-        ['lang/it/LC_MESSAGES/crtwo2fits.po',
-        'lang/it/LC_MESSAGES/crtwo2fits.mo'])
+        ('share/crtwo2fits', ['conf/crtwo2fits.conf']),
     ],
-    #scripts=['scripts/crtwo2fits'],
     python_requires=">=3.6",
     classifiers=[
         # How mature is this project? Common values are

@@ -47,18 +47,17 @@ import logging.handlers
 import subprocess
 import numpy as np
 
-import crtwo2fits
-import crtwo2fits.log as log
-import crtwo2fits.messages as msg
+from . import log
+from . import messages as msg
 
-localedir = os.path.join(
-    os.path.dirname(crtwo2fits.__file__),
+LOCALEDIR = os.path.join(
+    os.path.dirname(__file__),
     'data',
     'lang'
 )
 
 tr = gettext.translation('crtwo2fits',
-                         os.path.abspath(localedir),
+                         os.path.abspath(LOCALEDIR),
                          fallback=True)
 _ = tr.gettext
 

@@ -55,15 +55,10 @@ from . import cr2
 __all__ = ['cr2', 'log']
 
 
-if platform.system() == 'Linux' or platform.system() == 'Darwin':
-    TRANSLATION_DIR = os.path.join("/", "usr", "share", "crtwo2fits")
-elif platform.system() == 'Windows':
-    TRANSLATION_DIR = os.path.join("/", "usr", "share", "crtwo2fits")
-
 def main():
 
     try:
-        tr = gettext.translation('crtwo2fits', TRANSLATION_DIR)
+        tr = gettext.translation('mainapp', cr2.LOCALEDIR)
     except FileNotFoundError:
         tr = gettext.gettext
     else:
