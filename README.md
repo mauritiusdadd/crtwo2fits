@@ -23,12 +23,12 @@ along with this program.  If not, see (http://www.gnu.org/licenses/).
 
 ## Linux
 
-### Archlinux
+### - Archlinux
 
 To install this package just download the [PKGBUILD](https://aur.archlinux.org/packages/crtwo2fits/) from the AUR and use makepkg.
-    
-### From sources
-If you downloaded a source package, you should use pip to install the required dependencies and then the package itself
+
+### - From sources
+Unpack the source package or just clone the git repository, then use pip to install the required dependencies and then the package itself
 
     $ pip install -r requirements.txt
     $ pip install .
@@ -43,9 +43,21 @@ script manually.
 
 For list of python dependecies needed by this package see the file requirements.txt
 
-## Windows
+## Anaconda (platform independent, mostly)
 
-Under development
+Unpack the source package or just clone the git repository, then activate the environment you want to use and run pip to install the package
+
+    $ pip install .
+    
+The required dependencies should be already provided by the default environment, if this is not the case just install the dependencies listed in the file requirements.txt
+
+    $ conda install --file requirements.txt
+
+<b>NOTE</b>: Under linux pip usually installs the package in your user's local environment, so you may want to update the following environment variables
+
+    $ export PATH=${PATH}:~/.local/bin
+    $ export MANPATH=${MANPATH}:~/.local/share/man
+    
 
 # BUGS AND WISHES
 
