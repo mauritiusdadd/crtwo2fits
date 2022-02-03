@@ -33,9 +33,15 @@ Unpack the source package or just clone the git repository, then use pip to inst
     $ pip install -r requirements.txt
     $ pip install .
 
-Finally you should copy the configuration file into /etc:
+Finally you should copy the systemwide configuration file into /etc:
 
     # cp /usr/share/crtwo2fits/crtwo2fits.conf /etc
+
+This file contains the default configuration for the main program. You could create a custom per-user settings file by copying the default config in your ~/.config directory
+
+    # cp /usr/share/crtwo2fits/crtwo2fits.conf ~/.config
+
+The user defined settings will supersede the systemwide config.
 
 However, it is wisier to make a package compatible with the package manager
 of your distribution and use the latter instead of running the installation
@@ -53,7 +59,11 @@ The required dependencies should be already provided by the default environment,
 
     $ conda install --file requirements.txt
 
-<b>NOTE</b>: Under linux pip usually installs the package in your user's local environment, so you may want to update the following environment variables
+Under Linux and OS X you should create a custom per-user settings file by copying the default config in your ~/.config directory:
+
+    # cp <CONDA_DIRECTORY>/share/crtwo2fits/crtwo2fits.conf ~/.config
+
+Also note that under linux pip usually installs the package in your user local environment, so you may want to update the following environment variables
 
     $ export PATH=${PATH}:~/.local/bin
     $ export MANPATH=${MANPATH}:~/.local/share/man

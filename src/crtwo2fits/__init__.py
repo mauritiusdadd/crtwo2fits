@@ -55,7 +55,7 @@ from . import cr2
 __all__ = ['cr2', 'log']
 
 
-if platform.system() == 'Linux':
+if platform.system() == 'Linux' or platform.system() == 'Darwin':
     DEFAULT_DCRAW_EXC = shutil.which('dcraw')
     DEFAULT_DCRAW_FMT = '{exec} -t 0 -j -4 -W -D -d -c {file}'
 
