@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MSGFMT_EXEC="/usr/lib/python3.10/Tools/i18n/msgfmt.py"
+
 msg() {
   echo "==> $1"
 }
@@ -18,7 +20,7 @@ genTranslations() {
         for pofile in *.po; do
           mofile="${pofile/.po}.mo"
           msg2 "building translation file: $pofile >>> $mofile"
-          msgfmt "${pofile}" -o "${mofile}" 
+          $MSGFMT_EXEC -o "${mofile}" "${pofile}"
         done
       fi
       cd "$main_dir"
@@ -36,14 +38,14 @@ echo "-----------------------------------"
 echo ""
 
 genTranslations "lang"
-genTranslations "crtwo2fits/data/lang"
+genTranslations "src/crtwo2fits/data/lang"
 
 echo "Generating man files..."
 python generate-man.py
 echo ""
 
-echo "Building source package..."
-python setup.py sdist
-echo ""
+#echo "Building source package..."
+#python setup.py sdist
+#echo ""
 
 echo "Done!"

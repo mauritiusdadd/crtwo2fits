@@ -37,6 +37,30 @@ setuptools.setup(
         ['lang/it/LC_MESSAGES/crtwo2fits.po',
         'lang/it/LC_MESSAGES/crtwo2fits.mo'])
     ],
-    scripts=['scripts/crtwo2fits'],
+    #scripts=['scripts/crtwo2fits'],
     python_requires=">=3.6",
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 3 - Alpha',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Science/Research',
+        'Topic :: Multimedia :: Graphics :: Graphics Conversion',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3'
+    ],
+    keywords='cr2 fits astrphotography photo',
+    entry_points={
+        'console_scripts': [
+            'crtwo2fits=crtwo2fits:main',
+        ],
+    },
 )

@@ -21,9 +21,9 @@ files = [
 if __name__ == '__main__':
 
     for fname in files:
-        inp_f = open(fname, 'r')
-        text = inp_f.read()
-        inp_f.close
+        with open(fname, 'r') as inp_f:
+            text = inp_f.read()
+
         for key in dic:
             text = re.sub(r'%\('+key+'\)s', dic[key], text)
 

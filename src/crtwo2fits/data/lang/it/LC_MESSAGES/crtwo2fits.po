@@ -1,5 +1,5 @@
 # crtwo2fits is a program to convert CR2 files into FITS images
-# Copyright (C) 2015  Maurizio D'Addona <mauritiusdadd@gmail.com>
+# Copyright (C) 2015-2022  Maurizio D'Addona <mauritiusdadd@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
