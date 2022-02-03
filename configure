@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-MSGFMT_EXEC="/usr/lib/python3.10/Tools/i18n/msgfmt.py"
+MSGFMT_EXEC=$(which msgfmt)
 
 msg() {
   echo "==> $1"
@@ -37,7 +37,6 @@ echo "Generating message translations... "
 echo "-----------------------------------"
 echo ""
 
-genTranslations "lang"
 genTranslations "src/crtwo2fits/data/lang"
 
 echo "Generating man files..."
