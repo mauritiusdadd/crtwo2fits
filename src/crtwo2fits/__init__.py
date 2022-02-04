@@ -68,6 +68,15 @@ if platform.system() == 'Linux' or platform.system() == 'Darwin':
     )
 
 
+TEST_FILES_CR2 = [
+    "colorchecker"
+]
+
+
+def getTestFiles(filenames):
+    return [os.path.join(cr2.DATADIR, f"{x}.CR2") for x in filenames]
+
+
 def main():
 
     try:

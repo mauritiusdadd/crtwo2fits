@@ -50,21 +50,20 @@ import numpy as np
 from . import log
 from . import messages as msg
 
-LOCALEDIR = os.path.join(
-    os.path.dirname(__file__),
-    'data',
-    'lang'
-)
+DATADIR = os.path.join(os.path.dirname(__file__), 'data')
+LOCALEDIR = os.path.join(DATADIR, 'lang')
 
-tr = gettext.translation('crtwo2fits',
-                         os.path.abspath(LOCALEDIR),
-                         fallback=True)
-_ = tr.gettext
+tr = gettext.translation(
+    'crtwo2fits',
+    os.path.abspath(LOCALEDIR),
+    fallback=True
+)
+tr = tr.gettext
 
 try:
     import astropy.io.fits as pyfits
 except ImportError:
-    print(_(msg.ERR_NO_ASTROPY))
+    print(tr(msg.ERR_NO_ASTROPY))
 
 EXTENSION = {'.cr2': 'CR2'}
 
@@ -472,7 +471,7 @@ def pgm2numpy(data, byteorder='>'):
             data
         ).groups()
     except AttributeError:
-        log.log(_(msg.ERR_NOT_PGM), logging.ERROR)
+        log.log(tr(msg.ERR_NOT_PGM), logging.ERROR)
         return None
     else:
         pid = int(field[0])
@@ -487,17 +486,17 @@ def pgm2numpy(data, byteorder='>'):
         else:
             data_type = 'u1'
 
-        log.log(_(msg.DBG_IMG_WID.format(width)),
+        log.log(tr(msg.DBG_IMG_WID.format(width)),
                 logging.DEBUG)
-        log.log(_(msg.DBG_IMG_HEI.format(height)),
+        log.log(tr(msg.DBG_IMG_HEI.format(height)),
                 logging.DEBUG)
-        log.log(_(msg.DBG_IMG_DTP.format(data_type)),
+        log.log(tr(msg.DBG_IMG_DTP.format(data_type)),
                 logging.DEBUG)
 
     if pid == 5:
 
         # Raw (bynary) pgm data
-        log.log(_(msg.DBG_PGM_RAW_FOUND),
+        log.log(tr(msg.DBG_PGM_RAW_FOUND),
                 logging.DEBUG)
         n = np.frombuffer(image_data,
                           dtype=data_type,
@@ -506,12 +505,12 @@ def pgm2numpy(data, byteorder='>'):
 
         # plain text pgm data
         # NOTE: comments extends until end of line!
-        log.log(_(msg.DBG_PGM_TXT_FOUND),
+        log.log(tr(msg.DBG_PGM_TXT_FOUND),
                 logging.DEBUG)
         value = re.findall(rb"(\d+)(?:\s*#.*)*\s*", image_data)
 
         if len(value) != lenght:
-            log.log(_(msg.ERR_PGM_INVALID),
+            log.log(tr(msg.ERR_PGM_INVALID),
                     logging.ERROR)
             return None
 
@@ -519,7 +518,7 @@ def pgm2numpy(data, byteorder='>'):
         for i in range(lenght):
             n[i] = int(value[i])
     else:
-        log.log(_(msg.ERR_PGM_UNSUPPORTED),
+        log.log(tr(msg.ERR_PGM_UNSUPPORTED),
                 logging.ERROR)
         return None
 
@@ -680,8 +679,8 @@ class Sensor(object):
         compute the black level
     """
 
-    def __init__(self, data=(0, 0, 0, 0, 0, 0, 0, 0,
-                             0, 0, 0, 0, 0, 0, 0, 0, 0)):
+    def __init_tr(self, data=(0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0)):
         self.width = data[1]
         self.height = data[2]
         self.left_border = data[5]
@@ -693,7 +692,7 @@ class Sensor(object):
         self.black_mask_right_border = data[11]
         self.black_mask_bottom_border = data[12]
 
-    def __str__(self):
+    def __str_tr(self):
         s = 'Sensor Width : ' + str(self.width) + '\n'
         s += 'Sensor Height : ' + str(self.height) + '\n'
         s += 'Border Top : ' + str(self.top_border) + '\n'
@@ -721,7 +720,7 @@ class HuffmanTable(object):
         raw data from CR2 file
     """
 
-    def __init__(self, data=None):
+    def __init_tr(self, data=None):
 
         self.codes = {}
 
@@ -760,7 +759,7 @@ class HuffmanTable(object):
 
                 self.codes[index, type] = self.generateCodes(symbols)
 
-    def __repr__(self):
+    def __repr_tr(self):
 
         s = "\n"
         s += "-----------------------------\n"
@@ -842,7 +841,7 @@ class FrameTable(object):
         raw data from CR2 file
     """
 
-    def __init__(self, data):
+    def __init_tr(self, data):
 
         self.bits = data[4]
         self.height = _reconstructDataFromString(b'MM', data[5:7])
@@ -861,7 +860,7 @@ class FrameTable(object):
                     }
             self.componentsPropetries[i] = pdic
 
-    def __repr__(self):
+    def __repr_tr(self):
         s = '\n'
         s += "-----------------------------\n"
         s += "|        Frame Table        |\n"
@@ -900,7 +899,7 @@ class ScanTable(object):
         raw data from CR2 file
     """
 
-    def __init__(self, data):
+    def __init_tr(self, data):
 
         self.components = data[4]
         self.componentsPropetries = {}
@@ -917,7 +916,7 @@ class ScanTable(object):
                     }
             self.componentsPropetries[i] = pdic
 
-    def __repr__(self):
+    def __repr_tr(self):
         s = '\n'
         s += "-----------------------------\n"
         s += "|         Scan Table        |\n"
@@ -989,7 +988,7 @@ class CR2Image(object):
     format = "CR2"
     format_description = "Canon Raw format version 2"
 
-    def __init__(self, fname=None, ext_decoder=None, decoder_fmt_str=""):
+    def __init_tr(self, fname=None, ext_decoder=None, decoder_fmt_str=""):
 
         self.version = 0
         self.isOpened = False
@@ -997,7 +996,7 @@ class CR2Image(object):
         self.decoder_fmt = decoder_fmt_str
 
         if not self.hasExternalDecoder():
-            log.log(_(msg.WRN_NO_DECODER),
+            log.log(tr(msg.WRN_NO_DECODER),
                     logging.WARNING)
 
         if fname is not None:
@@ -1011,7 +1010,7 @@ class CR2Image(object):
         else:
             return os.path.isfile(self.decoder_exec)
 
-    def __del__(self):
+    def __del_tr(self):
         self.close()
 
     def getImageBorders(self):
@@ -1120,11 +1119,11 @@ class CR2Image(object):
             if uncropped is None:
                 return None
 
-            log.log(_(msg.DBG_SENSOR_SIZE.format(*uncropped.shape)),
+            log.log(tr(msg.DBG_SENSOR_SIZE.format(*uncropped.shape)),
                     logging.DEBUG)
 
             if full_frame:
-                log.log(_(msg.DBG_OUTPUT_SIZE.format(*uncropped.shape)),
+                log.log(tr(msg.DBG_OUTPUT_SIZE.format(*uncropped.shape)),
                         logging.DEBUG)
                 return uncropped
 
@@ -1137,10 +1136,10 @@ class CR2Image(object):
 
             try:
                 image = uncropped[tbord:bbord, lbord:rbord].copy()
-                log.log(_(msg.DBG_IMAGE_SIZE.format(*image.shape)),
+                log.log(tr(msg.DBG_IMAGE_SIZE.format(*image.shape)),
                         logging.DEBUG)
             except IndexError:
-                log.log(_(msg.ERR_SMALL_RAW),
+                log.log(tr(msg.ERR_SMALL_RAW),
                         logging.ERROR)
                 image = None
 
@@ -1174,10 +1173,10 @@ class CR2Image(object):
         elif byteorder == b'MM':
             self.mode = "L;16B"
         else:
-            raise SyntaxError(_(msg.ERR_UNKNOWN_ENDIAN))
+            raise SyntaxError(tr(msg.ERR_UNKNOWN_ENDIAN))
 
         if (header[2:3] != b'*') or (header[8:10] != b'CR'):
-            raise SyntaxError(_(msg.ERR_NOT_CR2))
+            raise SyntaxError(tr(msg.ERR_NOT_CR2))
 
         major_version = str(header[0x0a])  # should be 2
         minor_version = str(header[0x0b])  # should be 0
@@ -1192,14 +1191,14 @@ class CR2Image(object):
         self.IFD0 = self._readIfd(byteorder, ifd0_offset)
 
         if (EXIF not in self.IFD0.keys()):
-            raise SyntaxError(_(msg.ERR_NOT_CR2))
+            raise SyntaxError(tr(msg.ERR_NOT_CR2))
 
         exif_offset = self.IFD0[EXIF]
 
         self.EXIF = self._readIfd(byteorder, exif_offset)
 
         if (MAKERNOTE not in self.EXIF.keys()):
-            raise SyntaxError(_(msg.ERR_NOT_CR2))
+            raise SyntaxError(tr(msg.ERR_NOT_CR2))
 
         self.MAKERNOTES = self._readIfd(byteorder, self.EXIF[MAKERNOTE][2])
 
@@ -1266,19 +1265,19 @@ class CR2Image(object):
             or None if the decoding process failed
         """
 
-        log.log(_(msg.DBG_DECODER_NATIVE),
+        log.log(tr(msg.DBG_DECODER_NATIVE),
                 logging.DEBUG)
 
         self.fp.seek(self.CR2_SLICES[0], 0)
         rawdata = self.fp.read(self.CR2_SLICES[2])
 
         if rawdata[-2:] != EOI_MARKER:
-            raise SyntaxError(_(msg.ERR_MARKER_EOI))
+            raise SyntaxError(tr(msg.ERR_MARKER_EOI))
         else:
             image_data_end = len(rawdata) - 2
 
         if rawdata[0:2] != SOI_MARKER:
-            raise SyntaxError(_(msg.ERR_MARKER_SOI))
+            raise SyntaxError(tr(msg.ERR_MARKER_SOI))
         else:
             image_data_start = None
 
@@ -1339,7 +1338,7 @@ class CR2Image(object):
         if not self.hasExternalDecoder():
             return None
 
-        log.log(_(msg.DBG_DECODER_EXT),
+        log.log(tr(msg.DBG_DECODER_EXT),
                 logging.DEBUG)
 
         dec_cmd = self.decoder_fmt.format(
@@ -1353,7 +1352,7 @@ class CR2Image(object):
 
         if p.returncode is not None:
             log.log(
-                _(msg.ERR_EXT_DECODER).format(
+                tr(msg.ERR_EXT_DECODER).format(
                     str(self.decoder_exec),
                     str(p.stderr.read())
                 ),
@@ -1472,7 +1471,7 @@ class CR2Image(object):
         imageh = hts[SOF_MARKER].height
 
         if (imagew != self.Sensor.width) or (imageh != self.Sensor.height):
-            log.log(_(msg.WRN_CORRUPTED_CR2),
+            log.log(tr(msg.WRN_CORRUPTED_CR2),
                     logging.WARNING)
 
         # some usefull constants and variables
